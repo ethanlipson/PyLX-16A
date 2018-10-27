@@ -27,7 +27,7 @@ To set up the hardware for the servos:
 3. Connect a servo to the controller board, it doesn't matter which socket you choose
 4. (Optional) The servos can be daisy-chained, meaning you can connect servos to each other in sequence
 
-At this point, I would recommend downloading LewanSoul's Bus Servo Terminal software, which will allow you to check if your hardware is set up correctly. It can be found under the PC Software tab on the Downloads section of [their website](lewansoul.com).
+At this point, I would recommend downloading LewanSoul's Bus Servo Terminal software, which will allow you to check if your hardware is set up correctly. It can be found under the PC Software tab on the Downloads section of [their website](www.lewansoul.com).
 
 ### Software Installation
 
