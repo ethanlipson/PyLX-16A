@@ -21,7 +21,7 @@ To set up a system, such as a robot with multiple servos:
 
 ### Hardware Installation
 
-To set up the hardwaere for the servos:
+To set up the hardware for the servos:
 1. Connect your compouter and the controller board with the provided USB cable
 2. Connect a power source to the screw terminals on the controller board
 3. Connect a servo to the controller board, it doesn't matter which socket you choose
