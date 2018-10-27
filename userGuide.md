@@ -20,6 +20,8 @@ To set up a system, such as a robot with multiple servos:
 * Run the program (if you are running the sample program, the servos will oscillate in a sine wave out of phase with each other)
 
 ### Hardware Installation
-#### Footnote
-##### Double footnote
-###### aaaa
+
+To set up the hardwaere for the servos:
+1. aaa
+2. bbb
+3. wah
