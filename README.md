@@ -1,2 +1,2 @@
 # PyLX-16A
-A Python library for controlling LewanSoul's LX16-A serovs
+A Python library for controlling LewanSoul's LX-16A servos
