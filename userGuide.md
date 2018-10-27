@@ -27,3 +27,13 @@ To set up the hardware for the servos:
 3. Connect a servo to the controller board, it doesn't matter which socket you choose
 4. (Optional) The servos can be daisy-chained, meaning you can connect servos to each other in sequence
 
+### Software Installation
+
+To add PyLX-!6A to your project, make sure you install pySerial (`pip install pyserial`), and then place `lx16a.py` into your project directory, or clone this GitHub repository.
+
+Before controlling the servos, there is a bit of setup that must first be done.
+
+#### Controller Board Initialization
+
+sdgsfdg
+dsfgdsfg
