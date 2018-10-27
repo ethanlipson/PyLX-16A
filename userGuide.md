@@ -15,13 +15,15 @@ The library has the following structure:
 ## Setup
 
 To set up a system, such as a robot with multiple servos:
-* Install the hardware, including the servos, a power supply, a servo controller board, and cables
-* Create a folder containing lx16a.py, and your main program (such as the provided sample, helloWorld.py)
-* Run the program (if you are running the sample program, the servos will oscillate in a sine wave out of phase with each other)
+1. Install the hardware, including the servos, a power supply, a servo controller board, and cables
+2. Create a folder containing lx16a.py, and your main program (such as the provided sample, helloWorld.py)
+3. Run the program (if you are running the sample program, the servos will oscillate in a sine wave out of phase with each other)
 
 ### Hardware Installation
 
 To set up the hardwaere for the servos:
-1. aaa
-2. bbb
-3. wah
+1. Connect your compouter and the controller board with the provided USB cable
+2. Connect a power source to the screw terminals on the controller board
+3. Connect a servo to the controller board, it doesn't matter which socket you choose
+4. (Optional) The servos can be daisy-chained, meaning you can connect servos to each other in sequence
+
