@@ -11,3 +11,12 @@ The library has the following structure:
 * Each real-life servo has a corresponding instance of the `LX16A` class in the program
 * The virtual servos have member functions that control the physical servos
 * When there is an error relateing to a servo or servos, a `ServoError` exception is thrown
+
+## Setup
+
+To set up a system, such as a robot with multiple servos:
+* Install the hardware, including the servos, a power supply, a servo controller board, and cables
+* Create a folder containing lx16a.py, and your main program (such as the provided sample, helloWorld.py)
+* Run the program (if you are running the sample program, the servos will oscillate in a sine wave out of phase with each other)
+
+### Hardware Installation
