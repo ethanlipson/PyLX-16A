@@ -1,5 +1,5 @@
 # PyLX-16A
-Ethan Lipson
+Created by Ethan Lipson
 
 Revision 0.80, October 27, 2018
 
