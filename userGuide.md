@@ -46,4 +46,4 @@ Each physical servo has an ID associated with it, stored inside the servo. This 
 
 When a servo object is created in the program, its constructor requires an ID. When a method on a virtual servo is called, this has real world effects on the physical servo with the same ID. Essentially, if you create a servo object with ID 3, and tell that object to rotate by 90 degrees, then the real world servo with ID 3 will also rotate 90 degrees.
 
-If two servo objects are created, and they both have the same ID, then they are both referring to the same physical servo.
+If two servo objects are created, and they both have the same ID, then they are both referring to the same physical servo. Remember that servo objects have member variables, so if you have two servo objects with the same ID, and call a method with one of them, then their variables will differ.
