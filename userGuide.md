@@ -33,9 +33,17 @@ At this point, I would recommend downloading LewanSoul's Bus Servo Terminal soft
 
 To add PyLX-!6A to your project, make sure you install pySerial (`pip install pyserial`), and then place `lx16a.py` into your project directory, or clone this GitHub repository.
 
-Before controlling the servos, there is a bit of setup that must first be done.
+Before controlling the servos, there is a bit of setup that must first be done (inside the program).
 
 #### Controller Board Initialization
 
-sdgsfdg
-dsfgdsfg
+NOTE: I did this on a Raspberry Pi 3 Model B+ with Raspbian installed.
+################## Will be added later ##################
+
+#### Servo Initialization
+
+Each physical servo has an ID associated with it, stored inside the servo. This ID is in the range of 0-253 (inclusive) and is set either programmatically or using LewanSoul's software.
+
+When a servo object is created in the program, its constructor requires an ID. When a method on a virtual servo is called, this has real world effects on the physical servo with the same ID. Essentially, if I create a servo with ID 3 and tell that object to rotate by 90 degrees, the real world servo with ID 3 will also rotate 90 degrees.
+
+If two servo objects are created, and they both have the same ID, they are both referring to the same physical servo.
