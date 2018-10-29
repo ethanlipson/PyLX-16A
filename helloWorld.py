@@ -15,7 +15,7 @@ t = 0
 
 while True:
 	# Two sine waves out of phase
-	servo1.moveTimeWrite(sin(t))
-	servo2.moveTimeWrite(cos(t))
+	servo1.moveTimeWrite(sin(t) * 120 + 120)
+	servo2.moveTimeWrite(cos(t) * 120 + 120)
 	
 	t += 0.01
