@@ -41,7 +41,7 @@ NOTE: I only have experience with Windows and Raspbian. If you have more info, p
 
 The OS interfaces wither the controller board through a serial port, but which one? To find this port, I have two methods:
 * Windows - Try the ports `COM1`, `COM2`, `COM3`, etc. until it works.
-* Raspbian - Try each port in `/dev`. I used `/dev/ttyUSB0`.
+* Raspbian - Try each port in `/dev/`. I used `/dev/ttyUSB0`.
 
 Once you find this port, initialize the `LX16A` class with it. At the beginning of your code, put something like `LX16A.initialize('COM3')`, or `LX16A.initialize('/dev/ttyUSB0')`.
 
