@@ -37,7 +37,7 @@ Before controlling the servos, there is a bit of setup that must first be done (
 
 #### Controller Board Initialization
 
-NOTE: I only have experience with Windows and Raspbian, if you have more info please contact me.
+NOTE: I only have experience with Windows and Raspbian. If you have more info, please contact me.
 
 The OS interfaces wither the controller board through a serial port, but which one? To find this port, I have two methods:
 
