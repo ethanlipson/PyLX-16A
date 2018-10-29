@@ -31,7 +31,7 @@ At this point, I would recommend downloading LewanSoul's Bus Servo Terminal soft
 
 ### Software Installation
 
-To add PyLX-!6A to your project, make sure you install pySerial (`pip install pyserial`), and then place `lx16a.py` into your project directory, or clone this GitHub repository.
+To add PyLX-16A to your project, make sure you install pySerial (`pip install pyserial`), and then place `lx16a.py` into your project directory, or clone this GitHub repository.
 
 Before controlling the servos, there is a bit of setup that must first be done (inside the program).
 
