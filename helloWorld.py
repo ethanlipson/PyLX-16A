@@ -15,6 +15,8 @@ t = 0
 
 while True:
 	# Two sine waves out of phase
+	# The servos can rotate between 0 and 240 degrees,
+	# So we adjust the waves to be in that range
 	servo1.moveTimeWrite(sin(t) * 120 + 120)
 	servo2.moveTimeWrite(cos(t) * 120 + 120)
 	
