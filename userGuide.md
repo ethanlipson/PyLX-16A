@@ -10,7 +10,7 @@ The library has the following structure:
 * There is a central `LX16A` class
 * Each real-life servo has a corresponding instance of the `LX16A` class in the program
 * The virtual servos have member functions that control the physical servos
-* When there is an error relateing to a servo or servos, a `ServoError` exception is thrown
+* When there is an error relating to a servo or servos, a `ServoError` exception is thrown
 
 ## Setup
 
