@@ -631,7 +631,7 @@ class LX16A:
 	# Otherwise, [1, speed] is returned, where speed is the speed
 	# of the motor (between -1000 and 1000)
 	
-	def servoOrMotorModeRead(self):
+	def servoMotorModeRead(self):
 		packet = [0x55, 0x55, self.ID, 3, 30]
 		LX16A.sendPacket(packet)
 		
