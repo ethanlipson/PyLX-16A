@@ -1,13 +1,12 @@
 import serial
 import weakref
 
-#################################
-# Created by: Ethan Lipson      #
-# Version 0.8.0                 #
-# Questions? Bugs? Email me at  #
-# ethan.lipson@gmail.com        #
-# Published on October 27, 2018 #
-#################################
+################################
+# Created by: Ethan Lipson     #
+# Questions? Bugs? Email me at #
+# ethan.lipson@gmail.com       #
+# Published on August 31, 2018 #
+################################
 
 # getInstances() implementation from:
 # http://effbot.org/pyfaq/how-do-i-get-a-list-of-all-instances-of-a-given-class.htm
@@ -55,10 +54,6 @@ class LX16A:
 	def checkPacket(packet):
 		if LX16A.checksum(packet[:-1]) != packet[-1]:
 			raise ServoError("Invalid checksum")
-	
-	def updateAngle(self):
-		if self.angle != self.waitingAngle:
-			self.angle = self.waitingAngle
 	
 	@staticmethod
 	def getServos():
@@ -338,7 +333,7 @@ class LX16A:
 		LX16A.sendPacket(packet)
 		
 		for servo in LX16A.getServos():
-			servo.updateAngle()
+			servo.angle = servo.waitingAngle
 	
 	# Sends the servo.moveStop command to all connected servos
 	
@@ -451,7 +446,7 @@ class LX16A:
 	# [Angle, time (in milliseconds)]
 	
 	### THIS FUNCTION IS DYSFUNCTIONAL ###
-	###### DO NOT USE IT AS OF NOW #######
+	###### DO NOT USE IT AS OF NOW ######
 	
 	def moveTimeWaitRead(self):
 		print("This function (servo.moveTimeWaitRead) does not work right now")
@@ -531,7 +526,7 @@ class LX16A:
 		LX16A.checkPacket(returned)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
-		data = [int(x * 6 / 25) for x in data]
+		data = list(map(lambda x: int(x * 6 / 25), data))
 		
 		return data
 	
@@ -556,7 +551,7 @@ class LX16A:
 		return data
 	
 	# Returns the internal temperature limit of the servo
-	# Refer to servo.tempMaxLimitWrite for more information
+	# Refer ot servo.tempMaxLimitWrite for more information
 	
 	def tempMaxLimitRead(self):
 		packet = [0x55, 0x55, self.ID, 3, 25]
