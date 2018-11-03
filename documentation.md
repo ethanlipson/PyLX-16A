@@ -1,6 +1,6 @@
 # PyLX-16A Documentation
 
-## Class `LX16A`
+## Class LX16A
 
 ### Initialization Functions
 * LX16A.initialize(port)
