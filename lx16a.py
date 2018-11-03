@@ -35,8 +35,8 @@ class LX16A:
 	############### Utility Functions ###############
 	
 	@staticmethod
-	def checksum(nums):
-		s = ~sum(nums[2:])
+	def checksum(packet):
+		s = ~sum(packet[2:])
 		return s & 255
 
 	@staticmethod
