@@ -284,3 +284,32 @@ None
 
 #### Possible Errors
 None
+
+### LX16A.moveStop()
+Halts the servo's movement. LX16A.posRead() reflects its real angle, so it will still be accurate even after this function is called.
+
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+servo1.moveTimeWrite(180, 5000)
+
+time.sleep(2)
+
+# Halts the servos movement, wherever it is
+servo1.moveStop()
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+None
