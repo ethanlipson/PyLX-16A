@@ -27,6 +27,9 @@ class LX16A:
 		LX16A.controller = serial.Serial(port=port, baudrate=115200)
 	
 	def __init__(self, ID):
+		if ID < 0 or ID > 253:
+			raise ServoError("Servo ID out of range")
+		
 		self.ID = ID
 		self.angle = self.posRead()
 		self.waitingAngle = self.angle
