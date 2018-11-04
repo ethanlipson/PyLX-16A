@@ -15,8 +15,8 @@
 ### Write Commands
 * [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time0)
 * [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0)
-* LX16A.moveTimeWriteRel(relAngle, time=0)
-* LX16A.moveTimeWaitWriteRel(relAngle, time=0)
+* [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0)
+* [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0)
 * LX16A.moveStart()
 * LX16A.moveStop()
 * LX16A.IDWrite(ID)
