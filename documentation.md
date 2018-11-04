@@ -86,6 +86,9 @@ from lx16a import *
 LX16A.initialize("/dev/ttyUSB0")
 ```
 
+#### Return Value
+None
+
 #### Possible Errors
 If the port does not exist, a `SerialException` will be raised.
 
@@ -107,6 +110,9 @@ servo1 = LX16A(1)
 servo2 = LX16A(5)
 ```
 
+#### Return Value
+`LX16A` object
+
 #### Possible Errors
 If the `ID` parameter is out of range, a `ServoError` will be raised.
 
@@ -127,5 +133,13 @@ checksum = LX16A.checksum(data)
 print(checksum)
 ```
 
+#### Return Value
+An `int` between 0 and 255 (inclusive)
+
 #### Possible Errors
 If any of the elements of `nums` is not an `int`, a `TypeError` will be raised.
+
+### LX16A.toBytes(n)
+Converts an `int` between 0 and 65535 (inclusive) to a list of two numbers between 0 and 255 (inclusive), each representing a byte. The first element of the list is the MSB, and the second element is the LSB.
+
+| Parameter | Type | Upper Bound | Lower Bound |
