@@ -446,8 +446,8 @@ class LX16A:
 	# Parameter order:
 	# [Angle, time (in milliseconds)]
 	
-	### THIS FUNCTION IS DYSFUNCTIONAL ###
-	###### DO NOT USE IT AS OF NOW ######
+	##### THIS FUNCTION DOES NOT WORK #####
+	####### DO NOT USE IT AS OF NOW #######
 	
 	def moveTimeWaitRead(self):
 		print("This function (servo.moveTimeWaitRead) does not work right now")
