@@ -11,7 +11,6 @@
 * LX16A.toBytes(n)
 * LX16A.sendPacket(packet)
 * LX16A.checkPacket(packet)
-* LX16A.getServos()
 
 ### Write Commands
 * LX16A.moveTimeWrite(angle, time=0)
@@ -54,6 +53,7 @@
 * LX16A.moveStopAll()
 * LX16A.moveTimeWriteList(servos, data)
 * LX16A.moveTimeWriteListRel(servos, data)
+* LX16A.getServos()
 
 ## Documentation
 
@@ -116,30 +116,4 @@ servo2 = LX16A(5)
 #### Possible Errors
 If the `ID` parameter is out of range, a `ServoError` will be raised.
 
-### LX16A.checksum(nums)
-A checksum is included at the end of each command packet to ensure that the data is not corrupt. The formula is as follows: Sum up every number in the list, flip the bits, and take the least significant byte.
 
-| Parameter | Type           |
-| --------- | -------------- |
-| nums      | list of `int`s |
-
-#### Example Program
-```python
-from lx16a import *
-
-data = [8, 26, 0xB4, 1337, 54345]
-checksum = LX16A.checksum(data)
-
-print(checksum)
-```
-
-#### Return Value
-An `int` between 0 and 255 (inclusive)
-
-#### Possible Errors
-If any of the elements of `nums` is not an `int`, a `TypeError` will be raised.
-
-### LX16A.toBytes(n)
-Converts an `int` between 0 and 65535 (inclusive) to a list of two numbers between 0 and 255 (inclusive), each representing a byte. The first element of the list is the MSB, and the second element is the LSB.
-
-| Parameter | Type | Upper Bound | Lower Bound |
