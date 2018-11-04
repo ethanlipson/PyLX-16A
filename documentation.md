@@ -145,3 +145,36 @@ None
 
 #### Possible Errors
 If `angle` or `time` are out of range, a `ServoError` will be raised
+
+#### LX16A.moveTimeWaitWrite(angle, time=0)
+Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
+
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| angle     | `int` | 0           | 240         |
+| time      | `int` | 0           | 30000       |
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Stores angle=180 and time=2000 in servo1
+servo1.moveTimeWaitWrite(180, 2000)
+
+# Sleep for one second
+time.sleep(1)
+
+# Starts rotation of the servo
+servo1.moveStart()
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If `angle` or `time` are out of range, a `ServoError` will be raised
