@@ -1,6 +1,6 @@
 # PyLX-16A Documentation
 
-## Class LX16A
+## Reference Guide
 
 ### Initialization Functions
 * LX16A.initialize(port)
@@ -54,3 +54,5 @@
 * LX16A.moveStopAll()
 * LX16A.moveTimeWriteList(servos, data)
 * LX16A.moveTimeWriteListRel(servos, data)
+
+## Documentation
