@@ -7,8 +7,8 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 ## Reference Guide
 
 ### Initialization Functions
-* [LX16A.initialize(port)](#lx16ainitializeport)
-* [LX16A.\_\_init\_\_(ID)](#lx16a__init__id)
+* [LX16A.initialize(port)](#lx16ainitializeport) - Initializes the connection between the computer and the servo controller board
+* [LX16A.\_\_init\_\_(ID)](#lx16a__init__id) - Creates a servo object
 
 ### Utility Functions
 * LX16A.checksum(nums)
@@ -17,23 +17,23 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.checkPacket(packet)
 
 ### Write Commands
-* [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time0)
-* [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0)
-* [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0)
-* [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0)
-* [LX16A.moveStart()](#lx16amovestart)
-* [LX16A.moveStop()](#lx16amovestop)
-* [LX16A.IDWrite(ID)](#lx16aidwriteid)
-* [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset)
-* LX16A.angleOffsetWrite()
-* LX16A.angleLimitWrite(lower, upper)
-* LX16A.vInLimitWrite(lower, upper)
-* LX16A.tempMaxLimitWrite(temp)
-* LX16A.servoMode()
-* LX16A.motorMode(speed)
-* LX16A.loadOrUnloadWrite(power)
-* LX16A.LEDCtrlWrite(power)
-* LX16A.LEDErrorWrite(temp, volt, lock)
+* [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time0) - Rotates the servo to the specified angle over the specified time
+* [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0) - Sets an angle and time to be rotated to later
+* [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0) - Rotates the servo to the specified relative angle over the specified time
+* [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0) - Sets a relative angle and time to be rotated to later
+* [LX16A.moveStart()](#lx16amovestart) - Begins servo rotation (to be with `LX16A.moveTimeWaitWrite` or `LX16A.moveTimeWaitWriteRel`)
+* [LX16A.moveStop()](#lx16amovestop) - Halts the servo's rotation
+* [LX16A.IDWrite(ID)](#lx16aidwriteid) - Modifies the servo's ID
+* [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset) - Adjusts the servo's position offset
+* LX16A.angleOffsetWrite() - Permanently writes the servo's position offset to memory
+* LX16A.angleLimitWrite(lower, upper) - Adjusts the servo's angle boundaries
+* LX16A.vInLimitWrite(lower, upper) - Adjusts the servo's input voltage limits
+* LX16A.tempMaxLimitWrite(temp) - Adjusts the servo's maximum temperature limit
+* LX16A.servoMode() - Switches the servo to servo mode
+* LX16A.motorMode(speed) - Switches the servo to motor mode, and makes it rotate at the specified speed
+* LX16A.loadOrUnloadWrite(power) - Turns the servo on or off
+* LX16A.LEDCtrlWrite(power) - Turns the servo's LED on or off
+* LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
 
 ### Read Commands
 * LX16A.moveTimeRead()
