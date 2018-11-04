@@ -1,12 +1,13 @@
 import serial
 import weakref
 
-################################
-# Created by: Ethan Lipson     #
-# Questions? Bugs? Email me at #
-# ethan.lipson@gmail.com       #
-# Published on August 31, 2018 #
-################################
+#################################
+# Created by: Ethan Lipson      #
+# Questions? Bugs? Email me at  #
+# ethan.lipson@gmail.com        #
+# Version 0.8.0                 #
+# Published on November 4, 2018 #
+#################################
 
 # getInstances() implementation from:
 # http://effbot.org/pyfaq/how-do-i-get-a-list-of-all-instances-of-a-given-class.htm
