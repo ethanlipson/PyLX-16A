@@ -9,7 +9,7 @@ import weakref
 # Published on November 4, 2018 #
 #################################
 
-# getInstances() implementation from:
+# getServos() implementation from:
 # http://effbot.org/pyfaq/how-do-i-get-a-list-of-all-instances-of-a-given-class.htm
 
 class ServoError(Exception):
