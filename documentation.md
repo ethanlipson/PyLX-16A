@@ -17,7 +17,7 @@
 * [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0)
 * [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0)
 * [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0)
-* LX16A.moveStart()
+* [LX16A.moveStart()](#lx16amovestart)
 * LX16A.moveStop()
 * LX16A.IDWrite(ID)
 * LX16A.angleOffsetAdjust(offset)
@@ -247,3 +247,34 @@ None
 
 #### Possible Errors
 If the servo's current angle plus `relAngle` is out of range, or if `time` is out range, a `ServoError` will be raised.
+
+### LX16A.moveStart()
+Rotates the servo by the angle specified by LX16A.moveTimeWaitWrite, or by the the angle specified by moveTimeWaitWriteRel (relative to the servo's currenet angle), over the specified time.
+
+It has no parameters
+
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Stores angle=180 and time=2000 in servo1
+servo1.moveTimeWaitWrite(180, 2000)
+
+# Sleep for one second
+time.sleep(1)
+
+# Starts rotation of the servo
+servo1.moveStart()
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+None
