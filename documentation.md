@@ -345,7 +345,7 @@ None
 If `ID` is out of range, a `ServoError` will be raised.
 
 ### LX16A.angleOffsetAdjust(offset)
-Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle. When the servo is powered off, this offset is erased from its memory. To permanently set an offset, follow this command with `LX16A.angleOffsetWrite`.
+Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle. When the servo is powered off, this offset is erased from its memory. It is possible to achieve a negative angle using this command, by having the offset plus the virtual angle be negative. To permanently set an offset, follow this command with `LX16A.angleOffsetWrite`.
 
 NOTE: This command may affect the return value of LX16A.posRead()
 
