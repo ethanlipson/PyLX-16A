@@ -1,5 +1,9 @@
 # PyLX-16A Documentation
 
+This is the documentation for the Python library PyLX16A, a library for controlling LewanSoul's LX-16A servos. To get started with using them, read `userGuide.md`. This document specifies all of the functionality of the library, so I would recommend reading the User Guide first.
+
+NOTE: In this document, I make a distinction between the physical servo and the virtual servo object. In any program using PyLX16A, there should be a one-to-one correspondence between virtual servo objects and physical servos.
+
 ## Reference Guide
 
 ### Initialization Functions
@@ -18,8 +22,8 @@
 * [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0)
 * [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0)
 * [LX16A.moveStart()](#lx16amovestart)
-* LX16A.moveStop()
-* LX16A.IDWrite(ID)
+* [LX16A.moveStop()](#lx16amovestop)
+* [LX16A.IDWrite(ID)](#lx16aidwriteid)
 * LX16A.angleOffsetAdjust(offset)
 * LX16A.angleOffsetWrite()
 * LX16A.angleLimitWrite(lower, upper)
@@ -313,3 +317,29 @@ None
 
 #### Possible Errors
 None
+
+### LX16A.IDWrite(ID)
+Changes the ID of the physical servo as well as the servo object. After calling this function, the servo object will still work, but future servo objects referencing this physical servo will have to be aware of the ID change.
+
+#### Parameters
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| ID        | `int` | 0           | 253         |
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Changes servo1's ID to 4
+servo1.IDWrite(4)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If `ID` is out of range, a `ServoError` will be raised.
