@@ -97,3 +97,13 @@ A checksum is included at the end of each command packet to ensure that the data
 | Parameter | Type         |
 | --------- | ------------ |
 | nums      | list of ints |
+
+#### Example Program
+```python
+from lx16a import *
+
+data = [8, 26, 12321, 1337]
+checksum = LX16A.checksum(data)
+
+print(checksum)
+```
