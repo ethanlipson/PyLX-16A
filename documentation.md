@@ -69,7 +69,7 @@ Initiates the connection between the computer and the servo controller board. No
 from lx16a import *
 
 # Initializes the controller board on the port `COM3`
-# On Linux, you could use `/dev/ttyUSB0` instead
+# On Linux, you could use "/dev/ttyUSB0" instead
 LX16A.initialize("COM3")
 ```
 
