@@ -146,7 +146,7 @@ None
 #### Possible Errors
 If `angle` or `time` are out of range, a `ServoError` will be raised
 
-#### LX16A.moveTimeWaitWrite(angle, time=0)
+### LX16A.moveTimeWaitWrite(angle, time=0)
 Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
 
 | Parameter | Type  | Lower Bound | Upper Bound |
