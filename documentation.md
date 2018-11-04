@@ -94,6 +94,6 @@ servo2 = LX16A(5)
 ### LX16A.checksum(nums)
 A checksum is included at the end of each command packet to ensure that the data is not corrupt. The formula is as follows: Sum up every number in the list, flip the bits, and take the least significant byte.
 
-| Parameter | Type |
-| --------- | ---- |
+| Parameter | Type         |
+| --------- | ------------ |
 | nums      | list of ints |
