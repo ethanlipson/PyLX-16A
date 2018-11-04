@@ -13,8 +13,8 @@
 * LX16A.checkPacket(packet)
 
 ### Write Commands
-* [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangletime=0)
-* [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangletime=0)
+* [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time=0)
+* [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time=0)
 * LX16A.moveTimeWriteRel(relAngle, time=0)
 * LX16A.moveTimeWaitWriteRel(relAngle, time=0)
 * LX16A.moveStart()
