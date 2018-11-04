@@ -123,3 +123,25 @@ Rotates the servo to the specified angle (in degrees) over the given time (in mi
 | --------- | ----- | ----------- | ----------- |
 | angle     | `int` | 0           | 240         |
 | time      | `int` | 0           | 30000       |
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+servo2 = LX16A(2)
+
+# Rotates servo1 to its halfway position
+servo1.moveTimeWrite(120)
+
+# Rotates servo2 to 200 degrees over 3 seconds
+servo2.moveTimeWrite(200, 3000)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If `angle` or `time` are out of range, a `ServoError` will be raised
