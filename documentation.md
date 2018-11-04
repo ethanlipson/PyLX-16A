@@ -60,9 +60,9 @@
 ### LX16A.initialize(port)
 Initiates the connection between the computer and the servo controller board. No other commands will work if this function is not called.
 
-| Parameter | Type |
-| --------- | ---- |
-| port      | str  |
+| Parameter | Type   |
+| --------- | ------ |
+| port      | `str`  |
 
 #### Example Programs
 Windows
@@ -92,9 +92,9 @@ If the port does not exist, a `SerialException` will be raised.
 ### LX16A.\_\_init\_\_(ID)
 Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
 
-| Parameter | Type | Lower Bound | Upper Bound |
-| --------- | ---- | ----------- | ----------- |
-| ID        | int  | 0           | 253         |
+| Parameter | Type   | Lower Bound | Upper Bound |
+| --------- | ------ | ----------- | ----------- |
+| ID        | `int`  | 0           | 253         |
 
 #### Example Program
 ```python
@@ -113,9 +113,9 @@ If the `ID` parameter is out of range, a `ServoError` will be raised.
 ### LX16A.checksum(nums)
 A checksum is included at the end of each command packet to ensure that the data is not corrupt. The formula is as follows: Sum up every number in the list, flip the bits, and take the least significant byte.
 
-| Parameter | Type         |
-| --------- | ------------ |
-| nums      | list of ints |
+| Parameter | Type           |
+| --------- | -------------- |
+| nums      | list of `int`s |
 
 #### Example Program
 ```python
@@ -128,4 +128,4 @@ print(checksum)
 ```
 
 #### Possible Errors
-If any of the members of `nums` is not an int, a `TypeError` will be raised.
+If any of the members of `nums` is not an `int`, a `TypeError` will be raised.
