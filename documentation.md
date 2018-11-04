@@ -72,3 +72,20 @@ from lx16a import *
 # On Linux, you could use `/dev/ttyUSB0` instead
 LX16A.initialize("COM3")
 ```
+
+### LX16A.\_\_init\_\_(ID)
+Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
+
+| Parameter | Type | Lower Bound | Upper Bound |
+| --------- | ---- | ----------- | ----------- |
+| ID        | int  | 0           | 253         |
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+# Creates two virtual servo objects, with IDs 1 and 5
+servo1 = LX16A(1)
+servo2 = LX16A(5)
