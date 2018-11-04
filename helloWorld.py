@@ -5,7 +5,7 @@ from math import sin, cos
 # This will be different for different computers
 # On Windows, try the ports COM1, COM2, COM3, etc...
 # On Raspbian, try each port in /dev/
-LX16A.initialize('/dev/ttyUSB0')
+LX16A.initialize("/dev/ttyUSB0")
 
 # There should two servos connected, with IDs 1 and 2
 servo1 = LX16A(1)
