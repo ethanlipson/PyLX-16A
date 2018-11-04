@@ -96,6 +96,7 @@ If the port does not exist, a `SerialException` will be raised.
 ### LX16A.\_\_init\_\_(ID)
 Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
 
+#### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
 | ID        | `int` | 0           | 253         |
@@ -120,6 +121,7 @@ If the `ID` parameter is out of range, a `ServoError` will be raised.
 ### LX16A.moveTimeWrite(angle, time=0)
 Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
 
+#### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
 | angle     | `int` | 0           | 240         |
@@ -150,6 +152,7 @@ If `angle` or `time` are out of range, a `ServoError` will be raised.
 ### LX16A.moveTimeWaitWrite(angle, time=0)
 Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
 
+#### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
 | angle     | `int` | 0           | 240         |
@@ -183,6 +186,7 @@ If `angle` or `time` are out of range, a `ServoError` will be raised.
 ### LX16A.moveTimeWriteRel(relAngle, time=0)
 Rotates the servo relative to its current angle (in degrees) over the specified time (in seconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
 
+#### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
 | relAngle  | `int` | 0           | 240         |
@@ -216,6 +220,7 @@ If the servo's current angle plus `relAngle` is out of range, or if `time` is ou
 ### LX16A.moveTimeWaitWriteRel(relAngle, time=0)
 Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
 
+#### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
 | relAngle  | `int` | 0           | 240         |
@@ -252,8 +257,8 @@ If the servo's current angle plus `relAngle` is out of range, or if `time` is ou
 ### LX16A.moveStart()
 Rotates the servo by the angle specified by LX16A.moveTimeWaitWrite, or by the the angle specified by moveTimeWaitWriteRel (relative to the servo's currenet angle), over the specified time.
 
-It has no parameters
-
+#### Parameters
+None
 
 #### Example Program
 ```python
