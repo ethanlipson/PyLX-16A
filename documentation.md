@@ -63,3 +63,11 @@ Initiates the connection between the computer and the servo controller board. No
 | Parameter | Type |
 | --------- | ---- |
 | port      | str  |
+
+#### Example Program
+```python
+import lx16a
+
+# Initializes the controller board on the port `COM3`
+# On Linux, you could use `/dev/ttyUSB0` instead
+LX16A.initialize("COM3")
