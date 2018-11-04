@@ -45,6 +45,9 @@ class LX16A:
 
 	@staticmethod
 	def toBytes(n):
+		if n < 0 or n > 65535:
+			raise ServoError("Input out of range")
+		
 		return [n & 255, n // 256]
 	
 	@staticmethod
