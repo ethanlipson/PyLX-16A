@@ -4,7 +4,7 @@
 
 ### Initialization Functions
 * [LX16A.initialize(port)](#lx16ainitializeport)
-* [LX16A.\_\_init\_\_(ID)](#lx16a.\_\_init\_\_(id))
+* [LX16A.\_\_init\_\_(ID)](#lx16a__init__id)
 
 ### Utility Functions
 * LX16A.checksum(nums)
