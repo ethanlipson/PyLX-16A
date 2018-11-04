@@ -95,9 +95,9 @@ If the port does not exist, a `SerialException` will be raised.
 ### LX16A.\_\_init\_\_(ID)
 Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
 
-| Parameter | Type   | Lower Bound | Upper Bound |
-| --------- | ------ | ----------- | ----------- |
-| ID        | `int`  | 0           | 253         |
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| ID        | `int` | 0           | 253         |
 
 #### Example Program
 ```python
@@ -116,4 +116,10 @@ servo2 = LX16A(5)
 #### Possible Errors
 If the `ID` parameter is out of range, a `ServoError` will be raised.
 
+### LX16A.moveTimeWrite(angle, time=0)
+Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
 
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| angle     | `int` | 0           | 240         |
+| time      | `int` | 0           | 30000       |
