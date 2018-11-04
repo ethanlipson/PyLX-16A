@@ -117,7 +117,7 @@ servo2 = LX16A(5)
 If the `ID` parameter is out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWrite(angle, time=0)
-Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
+Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
 
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
@@ -144,7 +144,7 @@ servo2.moveTimeWrite(200, 3000)
 None
 
 #### Possible Errors
-If `angle` or `time` are out of range, a `ServoError` will be raised
+If `angle` or `time` are out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWaitWrite(angle, time=0)
 Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
@@ -177,4 +177,37 @@ servo1.moveStart()
 None
 
 #### Possible Errors
-If `angle` or `time` are out of range, a `ServoError` will be raised
+If `angle` or `time` are out of range, a `ServoError` will be raised.
+
+### LX16A.moveTimeWriteRel(relAngle, time=0)
+Rotates the servo relative to its current angle (in degrees) over the specified time (in seconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0.
+
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| relAngle  | `int` | 0           | 240         |
+| time      | `int` | 0           | 30000       |
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Rotate the servo to 120 degrees
+servo1.moveTimeWrite(120)
+
+# Wait for the servo to finish rotating
+time.sleep(1)
+
+# Rotate by 30 degrees to an absolute angle of 150 degrees
+servo1.moveTimeWriteRel(30)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If the servo's current angle plus `relAngle` is out of range, or if `time` is out range, a `ServoError` will be raised.
