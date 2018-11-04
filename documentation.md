@@ -211,3 +211,39 @@ None
 
 #### Possible Errors
 If the servo's current angle plus `relAngle` is out of range, or if `time` is out range, a `ServoError` will be raised.
+
+### LX16A.moveTimeWaitWriteRel(relAngle, time=0)
+Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called.
+
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| relAngle  | `int` | 0           | 240         |
+| time      | `int` | 0           | 30000       |
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Rotate the servo to 120 degrees
+servo1.moveTimeWrite(120)
+
+# Stores relAngle=30 and time=2000 in servo1
+servo1.moveTimeWaitWriteRel(30, 2000)
+
+# Wait for the servo to finish rotating
+time.sleep(1)
+
+# Rotate by the stored angle and time
+servo1.moveStart()
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If the servo's current angle plus `relAngle` is out of range, or if `time` is out range, a `ServoError` will be raised.
