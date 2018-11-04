@@ -102,7 +102,7 @@ A checksum is included at the end of each command packet to ensure that the data
 ```python
 from lx16a import *
 
-data = [8, 26, 12321, 1337]
+data = [8, 26, 0xB4, 1337, 54345]
 checksum = LX16A.checksum(data)
 
 print(checksum)
