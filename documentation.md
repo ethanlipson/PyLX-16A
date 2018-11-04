@@ -6,7 +6,7 @@
 * LX16A.initialize(port)
 * LX16A.\_\_init\_\_(ID)
 
-### Utility Funcitons
+### Utility Functions
 * LX16A.checksum(nums)
 * LX16A.toBytes(n)
 * LX16A.sendPacket(packet)
