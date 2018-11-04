@@ -149,7 +149,7 @@ class LX16A:
 	# Possible ID values: [0, 253], int
 	
 	def IDWrite(self, ID):
-		if ID < 0 or ID > 254:
+		if ID < 0 or ID > 253:
 			raise ServoError("ID out of range")
 		
 		packet = [0x55, 0x55, self.ID, 4, 13, ID]
