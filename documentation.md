@@ -59,7 +59,6 @@
 
 ### LX16A.initialize(port)
 Initiates the connection between the computer and the servo controller board. No other commands will work if this function is not called.
-
 | Parameter | type |
 | --------- | ---- |
 | port      | str  |
