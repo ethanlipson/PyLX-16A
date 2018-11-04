@@ -64,14 +64,30 @@ Initiates the connection between the computer and the servo controller board. No
 | --------- | ---- |
 | port      | str  |
 
-#### Example Program
+#### Example Programs
+Windows
 ```python
 from lx16a import *
 
-# Initializes the controller board on the port `COM3`
-# On Linux, you could use "/dev/ttyUSB0" instead
+# To find the port on Windows, try COM1, COM2, COM3, COM4, etc.
+
+# This program initializes the controller board on the port COM3
 LX16A.initialize("COM3")
 ```
+
+Linux
+```python
+from lx16a import *
+
+# To find the port on Windows, go to the directory /dev/ in the terminal,
+# and type `ls`. This will list all available ports, so try all of them
+
+# This program initializes the controller board on the port /dev/ttyUSB0
+LX16A.initialize("/dev/ttyUSB0")
+```
+
+#### Possible Errors
+If the port does not exist, a `SerialException` will be raised.
 
 ### LX16A.\_\_init\_\_(ID)
 Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
@@ -91,6 +107,9 @@ servo1 = LX16A(1)
 servo2 = LX16A(5)
 ```
 
+#### Possible Errors
+If the `ID` parameter is out of range, a `ServoError` will be raised.
+
 ### LX16A.checksum(nums)
 A checksum is included at the end of each command packet to ensure that the data is not corrupt. The formula is as follows: Sum up every number in the list, flip the bits, and take the least significant byte.
 
@@ -107,3 +126,6 @@ checksum = LX16A.checksum(data)
 
 print(checksum)
 ```
+
+#### Possible Errors
+If any of the members of `nums` is not an int, a `TypeError` will be raised.
