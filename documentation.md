@@ -89,3 +89,11 @@ LX16A.initialize("COM3")
 # Creates two virtual servo objects, with IDs 1 and 5
 servo1 = LX16A(1)
 servo2 = LX16A(5)
+```
+
+### LX16A.checksum(nums)
+A checksum is included at the end of each command packet to ensure that the data is not corrupt. The formula is as follows: Sum up every number in the list, flip the bits, and take the least significant byte.
+
+| Parameter | Type |
+| --------- | ---- |
+| nums      | list of ints |
