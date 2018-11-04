@@ -128,4 +128,4 @@ print(checksum)
 ```
 
 #### Possible Errors
-If any of the members of `nums` is not an `int`, a `TypeError` will be raised.
+If any of the elements of `nums` is not an `int`, a `TypeError` will be raised.
