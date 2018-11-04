@@ -24,7 +24,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.moveStart()](#lx16amovestart)
 * [LX16A.moveStop()](#lx16amovestop)
 * [LX16A.IDWrite(ID)](#lx16aidwriteid)
-* LX16A.angleOffsetAdjust(offset)
+* [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset)
 * LX16A.angleOffsetWrite()
 * LX16A.angleLimitWrite(lower, upper)
 * LX16A.vInLimitWrite(lower, upper)
@@ -343,3 +343,35 @@ None
 
 #### Possible Errors
 If `ID` is out of range, a `ServoError` will be raised.
+
+### LX16A.angleOffsetAdjust(offset)
+Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle.
+
+NOTE: This command may affect the return value of LX16A.posRead()
+
+#### Parameters
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| offset    | `int` | -125        | 125         |
+
+#### Example Code
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Sets the servo's offset to -4 degrees
+servo1.angleOffsetAdjust(-4)
+
+# Rotates to 120 degrees, but if the offset is taken into account,
+# the servo is really at 116 degrees
+servo1.moveTimeWrite(120)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If `offset` is out of range, a `ServoError` will be raised.
