@@ -27,7 +27,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset) - Adjusts the servo's position offset
 * [LX16A.angleOffsetWrite()](#lx16aangleoffsetwrite) - Permanently writes the servo's position offset to memory
 * [LX16A.angleLimitWrite(lower, upper)](#lx16aanglelimitwritelower-upper) - Adjusts the servo's angle boundaries
-* LX16A.vInLimitWrite(lower, upper) - Adjusts the servo's input voltage limits
+* [LX16A.vInLimitWrite(lower, upper)](#lx16avinlimitwritelower-upper) - Adjusts the servo's input voltage limits
 * LX16A.tempMaxLimitWrite(temp) - Adjusts the servo's maximum temperature limit
 * LX16A.servoMode() - Switches the servo to servo mode
 * LX16A.motorMode(speed) - Switches the servo to motor mode, and makes it rotate at the specified speed
