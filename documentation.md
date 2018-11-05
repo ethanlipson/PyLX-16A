@@ -441,5 +441,34 @@ servo1.moveTimeWrite(90)
 #### Return Value
 None
 
-#### Possible errors
+#### Possible Errors
 If either `lower` or `upper` is out of range, or if `lower` >= `upper`, then an exception will be raised.
+
+### LX16A.vInLimitWrite(lower, upper)
+Sets the lower and upper limits (in millivolts) for the voltage going into the servo. If the voltage goes outside of these bounds, then the servo will stop working, and the LED will flash. Note that the lower bound must be strictly less than the upper bound.
+
+#### Parameters
+| Parameters | Type  | Lower Bound | Upper Bound |
+| ---------- | ----- | ----------- | ----------- |
+| lower      | `int` | 4500        | 12000       |
+| upper      | `int` | 4500        | 12000       |
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Normal range
+servo1.vInLimitWrite(6000, 10000)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+If either `lower` or `upper` is out of range, or if `lower` >= `upper`, then an exception will be raised.
+
+
