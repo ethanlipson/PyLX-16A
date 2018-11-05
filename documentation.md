@@ -36,28 +36,27 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
 
 ### Read Commands
-* LX16A.moveTimeRead()
-* LX16A.moveTimeWaitRead()
-* LX16A.IDRead()
-* LX16A.angleOffsetRead()
-* LX16A.angleLimitRead()
-* LX16A.vInLimitRead()
-* LX16A.tempMaxLimitRead()
-* LX16A.tempRead()
-* LX16A.vInRead()
-* LX16A.posRead()
-* LX16A.servoMotorModeRead()
-* LX16A.loadOrUnloadRead()
-* LX16A.LEDCtrlRead()
-* LX16A.LEDErrorRead()
-
+* LX16A.moveTimeRead() - Returns the parameters to the last call to `LX16A.moveTimeWrite`
+* LX16A.moveTimeWaitRead() - Returns the parameters to the last call to `LX16A.moveTimeWaitWrite`
+* LX16A.IDRead() - Returns the servo's ID
+* LX16A.angleOffsetRead() - Returns the servo's angle offset
+* LX16A.angleLimitRead() - Returns the servo's angle limits
+* LX16A.vInLimitRead() - Returns the maximum legal input voltage to the servo
+* LX16A.tempMaxLimitRead() - Returns the maximum legal temperature of the servo
+* LX16A.tempRead() - Returns the current temperature of the servo
+* LX16A.vInRead() - Returns the current input voltage to the servo
+* LX16A.posRead() - Returns the current position of the servo
+* LX16A.servoMotorModeRead() - Returns whether the servo is in servo or motor mode
+* LX16A.loadOrUnloadRead() - Returns whether the servo is loaded or unloaded
+* LX16A.LEDCtrlRead() - Returns whether the LED is on or off
+* LX16A.LEDErrorRead() - Returns which error conditions will cause the LED to flash
 
 ### Global Commands
-* LX16A.moveStartAll()
-* LX16A.moveStopAll()
-* LX16A.moveTimeWriteList(servos, data)
-* LX16A.moveTimeWriteListRel(servos, data)
-* LX16A.getServos()
+* LX16A.moveStartAll() - Rotates all servos at once (if they have parameters set by `LX16A.moveTimeWaitWrite` or `LX16A.moveTimeWaitWriteRel`.
+* LX16A.moveStopAll() - Halts all servo movement
+* LX16A.moveTimeWriteList(servos, data) - Moves multiple servos simultaneously, each with distinct parameters
+* LX16A.moveTimeWriteListRel(servos, data) - Moves multiple servos simultaneously, each with distinct parameters, and with relative angles
+* LX16A.getServos() - Returns a list of all `LX16A` objects in existence
 
 ## Documentation
 
