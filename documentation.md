@@ -354,7 +354,7 @@ NOTE: This command may affect the return value of LX16A.posRead()
 | --------- | ----- | ----------- | ----------- |
 | offset    | `int` | -125        | 125         |
 
-#### Example Code
+#### Example Program
 ```python
 from lx16a import *
 
@@ -382,22 +382,24 @@ Permanently writes the angle offset (set by `LX16A.angleOffsetAdjust`) to the se
 #### Parameters
 None
 
-#### Example code
+#### Example Program
 ```python
+from lx16a import *
+
 LX16A.initialize("COM3")
 
 servo1 = LX16A(1)
 
 # Set the angle offset to 22 degrees
-LX16A.angleOffsetAdjust(22)
-LX16A.angleOffsetWrite()
+servo1.angleOffsetAdjust(22)
+servo1.angleOffsetWrite()
 
 # Power the servo off and on again
 # ...
 
 # Write 90 degrees to the servo, but since it still remembers the offset,
 # the servo is really at 112 degrees (90 + 22 degrees)
-LX16A.angleOffsetWrite(90)
+servo1.angleOffsetWrite(90)
 ```
 
 #### Return Value
@@ -405,3 +407,39 @@ None
 
 #### Possible Errors
 None
+
+### LX16A.angleLimitWrite(lower, upper)
+Sets the upper and lower limits for the servo's position. By default, these values are at their limits, 0 and 240 degrees. Note that the lower bound must be strictly less than the upper bound. If you attempt to rotate the servo to a position out of bounds, it will rotate but stop at its limits. If the servo's position is out of bounds set by this command, the servo will be able to rotate back into the legal range, but not back out.
+
+#### Parameters
+| Parameters | Type  | Lower Bound | Upper Bound |
+| ---------- | ----- | ----------- | ----------- |
+| lower      | `int` | 0           | 240         |
+| upper      | `int` | 0           | 240         |
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+servo1.moveTimeWrite(120)
+
+time.sleep(1)
+
+servo1.angleLimitWrite(60, 180)
+
+# This command works
+servo1.moveTimeWrite(90)
+
+# This one does not
+# servo1.moveTimeWrite(210)
+
+#### Return Value
+None
+
+#### Possible errors
+If either `lower` or `upper` is out of range, or if `lower` >= `upper`, then an exception will be raised.
