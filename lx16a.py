@@ -34,6 +34,10 @@ class LX16A:
 		self.angle = self.posRead()
 		self.waitingAngle = self.angle
 		
+		limits = self.angleLimitRead()
+		self.lowerLimit = limits[0]
+		self.upperLimit = limits[1]
+		
 		LX16A.servos.add(weakref.ref(self))
 	
 	############### Utility Functions ###############
@@ -86,7 +90,7 @@ class LX16A:
 	# Possible time values (in milliseconds): [0, 30000], int
 	
 	def moveTimeWrite(self, angle, time=0):
-		if angle < 0 or angle > 240:
+		if angle < self.lowerLimit or angle > self.upperLimit:
 			raise ServoError("Angle out of range")
 		if time < 0 or time > 30000:
 			raise ServoError("Time out of range")
@@ -106,7 +110,7 @@ class LX16A:
 	# Possible time values (in milliseconds): [0, 30000], int
 	
 	def moveTimeWaitWrite(self, angle, time=0):
-		if angle < 0 or angle > 240:
+		if angle < self.lowerLimit or angle > self.upperLimit:
 			raise ServoError("Angle out of range")
 		if time < 0 or time > 30000:
 			raise ServoError("Time out of range")
@@ -211,6 +215,9 @@ class LX16A:
 			raise ServoError("Upper bound out of range")
 		if lower >= upper:
 			raise ServoError("Lower bound must be less than upper bound")
+		
+		self.lowerLimit = lower
+		self.upperLimit = upper
 		
 		lower = int(lower * 25 / 6)
 		upper = int(upper * 25 / 6)
@@ -376,7 +383,7 @@ class LX16A:
 		
 		for i in range(len(servos)):
 			if len(data[i]) != 2:
-				raise ServoError("All commands must come in (angle, time) pairs!")
+				raise ServoError("All commands must come in (angle, time) pairs")
 			
 			servos[i].moveTimeWaitWrite(data[i][0], data[i][1])
 		
@@ -386,7 +393,7 @@ class LX16A:
 	# is relative to the servo's current virtual angle
 	
 	def moveTimeWriteRel(self, relAngle, time=0):
-		if self.angle + relAngle < 0 or self.angle + relAngle > 240:
+		if self.angle + relAngle < self.lowerLimit or self.angle + relAngle > self.upperLimit:
 			raise ServoError("Absolute angle out of range")
 		
 		self.moveTimeWrite(self.angle + relAngle, time)
@@ -395,7 +402,7 @@ class LX16A:
 	# is relative to the servo's current virtual angle
 	
 	def moveTimeWaitWriteRel(self, relAngle, time=0):
-		if self.angle + relAngle < 0 or self.angle + relAngle > 240:
+		if self.angle + relAngle < self.lowerLimit or self.angle + relAngle > self.upperLimit:
 			raise ServoError("Absolute angle out of range")
 		
 		self.moveTimeWaitWrite(self.angle + relAngle, time)
@@ -415,7 +422,7 @@ class LX16A:
 		
 		for i in range(len(servos)):
 			if len(data[i]) != 2:
-				raise ServoError("All commands must come in (angle, time) pairs!")
+				raise ServoError("All commands must come in (angle, time) pairs")
 			
 			servos[i].moveTimeWaitWrite(servos[i].angle + data[i][0], data[i][1])
 		
@@ -533,7 +540,7 @@ class LX16A:
 		LX16A.checkPacket(returned)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
-		data = list(map(lambda x: int(x * 6 / 25), data))
+		data = [int(x * 6 / 25) for x in data]
 		
 		return data
 	
@@ -725,4 +732,3 @@ class LX16A:
 		lock = int(bool(returned[5] & 4))
 		
 		return [temp, volt, lock]
-
