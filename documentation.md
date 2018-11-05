@@ -411,10 +411,10 @@ None
 Sets the upper and lower limits for the servo's position. By default, these values are at their limits, 0 and 240 degrees. Note that the lower bound must be strictly less than the upper bound. If you attempt to rotate the servo to a position out of bounds, it will rotate but stop at its limits. If the servo's position is out of bounds set by this command, the servo will be able to rotate back into the legal range, but not back out.
 
 #### Parameters
-| Parameters | Type  | Lower Bound | Upper Bound |
-| ---------- | ----- | ----------- | ----------- |
-| lower      | `int` | 0           | 240         |
-| upper      | `int` | 0           | 240         |
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| lower     | `int` | 0           | 240         |
+| upper     | `int` | 0           | 240         |
 
 #### Example Program
 ```python
@@ -448,10 +448,10 @@ If either `lower` or `upper` is out of range, or if `lower` >= `upper`, then an 
 Sets the lower and upper limits (in millivolts) for the voltage going into the servo. If the voltage goes outside of these bounds, then the servo will stop working, and the LED will flash. Note that the lower bound must be strictly less than the upper bound.
 
 #### Parameters
-| Parameters | Type  | Lower Bound | Upper Bound |
-| ---------- | ----- | ----------- | ----------- |
-| lower      | `int` | 4500        | 12000       |
-| upper      | `int` | 4500        | 12000       |
+| Parameter | Type  | Lower Bound | Upper Bound |
+| --------- | ----- | ----------- | ----------- |
+| lower     | `int` | 4500        | 12000       |
+| upper     | `int` | 4500        | 12000       |
 
 #### Example Program
 ```python
