@@ -384,7 +384,7 @@ None
 
 #### Example code
 ```python
-LX16A.initialize("Com3")
+LX16A.initialize("COM3")
 
 servo1 = LX16A(1)
 
