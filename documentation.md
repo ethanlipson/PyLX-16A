@@ -25,7 +25,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.moveStop()](#lx16amovestop) - Halts the servo's rotation
 * [LX16A.IDWrite(ID)](#lx16aidwriteid) - Modifies the servo's ID
 * [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset) - Adjusts the servo's position offset
-* LX16A.angleOffsetWrite() - Permanently writes the servo's position offset to memory
+* [LX16A.angleOffsetWrite()](#lx16aangleoffsetwrite) - Permanently writes the servo's position offset to memory
 * LX16A.angleLimitWrite(lower, upper) - Adjusts the servo's angle boundaries
 * LX16A.vInLimitWrite(lower, upper) - Adjusts the servo's input voltage limits
 * LX16A.tempMaxLimitWrite(temp) - Adjusts the servo's maximum temperature limit
@@ -375,3 +375,33 @@ None
 
 #### Possible Errors
 If `offset` is out of range, a `ServoError` will be raised.
+
+### LX16A.angleOffsetWrite()
+Permanently writes the angle offset (set by `LX16A.angleOffsetAdjust`) to the servo's memory. Normally, after the servo is powered off, it loses its angle offset, but after using this command, it will remember.
+
+#### Parameters
+None
+
+#### Example code
+```python
+LX16A.initialize("Com3")
+
+servo1 = LX16A(1)
+
+# Set the angle offset to 22 degrees
+LX16A.angleOffsetAdjust(22)
+LX16A.angleOffsetWrite()
+
+# Power the servo off and on again
+# ...
+
+# Write 90 degrees to the servo, but since it still remembers the offset,
+# the servo is really at 112 degrees (90 + 22 degrees)
+LX16A.angleOffsetWrite(90)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+None
