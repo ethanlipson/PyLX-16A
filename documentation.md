@@ -150,7 +150,7 @@ None
 If `angle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWaitWrite(angle, time=0)
-Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll`](#lx16amovestartall) is called. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll()`](#lx16amovestartall) is called. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -222,7 +222,7 @@ None
 If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWaitWriteRel(relAngle, time=0)
-Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll`](#lx16amovestartall) is called. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll()`](#lx16amovestartall) is called. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
