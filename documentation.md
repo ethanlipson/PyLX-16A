@@ -10,12 +10,6 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.initialize(port)](#lx16ainitializeport) - Initializes the connection between the computer and the servo controller board
 * [LX16A.\_\_init\_\_(ID)](#lx16a__init__id) - Creates a servo object
 
-### Utility Functions
-* LX16A.checksum(nums)
-* LX16A.toBytes(n)
-* LX16A.sendPacket(packet)
-* LX16A.checkPacket(packet)
-
 ### Write Commands
 * [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time0) - Rotates the servo to the specified angle over the specified time
 * [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0) - Sets an angle and time to be rotated to later
@@ -45,7 +39,8 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.tempMaxLimitRead() - Returns the maximum legal temperature of the servo
 * LX16A.tempRead() - Returns the current temperature of the servo
 * LX16A.vInRead() - Returns the current input voltage to the servo
-* LX16A.posRead() - Returns the current position of the servo
+* LX16A.getPhysicalPos() - Returns the current physical position of the servo
+* LX16A.getVirtualPos() - Returns the current virtual position of the servo
 * LX16A.servoMotorModeRead() - Returns whether the servo is in servo or motor mode
 * LX16A.loadOrUnloadRead() - Returns whether the servo is loaded or unloaded
 * LX16A.LEDCtrlRead() - Returns whether the LED is on or off
