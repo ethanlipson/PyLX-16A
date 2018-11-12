@@ -31,7 +31,7 @@ class LX16A:
 			raise ServoError("Servo ID out of range")
 		
 		self.ID = ID
-		self.angle = self.posRead()
+		self.angle = self.getPhysicalPos()
 		self.waitingAngle = self.angle
 		
 		limits = self.angleLimitRead()
@@ -138,7 +138,7 @@ class LX16A:
 		packet = [0x55, 0x55, self.ID, 3, 12]
 		LX16A.sendPacket(packet)
 		
-		self.angle = self.posRead()
+		self.angle = self.getPhysicalPos()
 	
 	# Changes the servo's ID to the
 	# parameter passed to this function
@@ -357,7 +357,7 @@ class LX16A:
 		LX16A.sendPacket(packet)
 		
 		for servo in LX16A.getServos():
-			servo.angle = servo.posRead()
+			servo.angle = servo.getPhysicalPos()
 	
 	# Rotates multiple servos simultaneously
 	
@@ -613,14 +613,14 @@ class LX16A:
 		
 		return returned[6] * 256 + returned[5]
 	
-	# Returns the position of the servo
+	# Returns the physical position of the servo
 	
 	# Note that the position is relative to the angle offset
 	# So if you set the angle offset to -125
 	# and then set the position to 0 (using servo.moveTimeWrite, for example),
 	# it will still read as being in position 0
 	
-	def posRead(self):
+	def getPhysicalPos(self):
 		packet = [0x55, 0x55, self.ID, 3, 28]
 		LX16A.sendPacket(packet)
 		
@@ -732,3 +732,8 @@ class LX16A:
 		lock = int(bool(returned[5] & 4))
 		
 		return [temp, volt, lock]
+	
+	# Returns the virtual angle of the servo
+	
+	def getVirtualPos(self):
+		return self.angle
