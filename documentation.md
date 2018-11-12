@@ -15,7 +15,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0) - Sets an angle and time to be rotated to later
 * [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0) - Rotates the servo to the specified relative angle over the specified time
 * [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0) - Sets a relative angle and time to be rotated to later
-* [LX16A.moveStart()](#lx16amovestart) - Begins servo rotation (to be with [`LX16A.moveTimeWaitWrite`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel`](#lx16amovetimewaitwriterelrelangle-time0))
+* [LX16A.moveStart()](#lx16amovestart) - Begins servo rotation (to be with [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0))
 * [LX16A.moveStop()](#lx16amovestop) - Halts the servo's rotation
 * [LX16A.IDWrite(ID)](#lx16aidwriteid) - Modifies the servo's ID
 * [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset) - Adjusts the servo's position offset
@@ -30,8 +30,8 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
 
 ### Read Commands
-* LX16A.moveTimeRead() - Returns the parameters to the last call to `LX16A.moveTimeWrite`
-* LX16A.moveTimeWaitRead() - Returns the parameters to the last call to `LX16A.moveTimeWaitWrite`
+* LX16A.moveTimeRead() - Returns the parameters to the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0)
+* LX16A.moveTimeWaitRead() - Returns the parameters to the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0)
 * LX16A.IDRead() - Returns the servo's ID
 * LX16A.angleOffsetRead() - Returns the servo's angle offset
 * LX16A.angleLimitRead() - Returns the servo's angle limits
