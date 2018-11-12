@@ -261,7 +261,7 @@ None
 If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
 
 ### LX16A.moveStart()
-Rotates the servo by the angle specified by LX16A.moveTimeWaitWrite, or by the the angle specified by moveTimeWaitWriteRel (relative to the servo's current angle), over the specified time.
+Rotates the servo by the angle specified by [LX16A.moveTimeWaitWrite()](#lx16amovetimewaitwriteangle-time0), or by the the angle specified by [moveTimeWaitWriteRel()](#lx16amovetimewaitwriterelangle-time0) (relative to the servo's current angle), over the specified time.
 
 #### Parameters
 None
@@ -292,7 +292,7 @@ None
 None
 
 ### LX16A.moveStop()
-Halts the servo's movement. LX16A.posRead() reflects its real angle, so it will still be accurate even after this function is called.
+Halts the servo's movement. Both [`LX16A.getPhysicalPos()`](#lx16agetphysicalpos) and [`LX16A.getVirtualPos()`](#lx16agetvirtualpos) will still be accurate after this function is called.
 
 #### Parameters
 None
@@ -347,9 +347,9 @@ None
 If `ID` is out of range, a `ServoError` will be raised.
 
 ### LX16A.angleOffsetAdjust(offset)
-Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle. When the servo is powered off, this offset is erased from its memory. It is possible to achieve a negative angle using this command, by having the offset plus the virtual angle be negative. To permanently set an offset, follow this command with `LX16A.angleOffsetWrite`.
+Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle. When the servo is powered off, this offset is erased from its memory. It is possible to achieve a negative angle using this command, by having the offset plus the virtual angle be negative. To permanently set an offset, follow this command with [`LX16A.angleOffsetWrite()`](#lx16aangleoffsetwrite).
 
-NOTE: This command may affect the return value of LX16A.posRead()
+NOTE: This command may affect the return value of [`LX16A.getPhysicalPos()`](#lx16agetphysicalpos) and [`LX16A.getVirtualPos()`](#lx16agetvirtualpos).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -379,7 +379,7 @@ None
 If `offset` is out of range, a `ServoError` will be raised.
 
 ### LX16A.angleOffsetWrite()
-Permanently writes the angle offset (set by `LX16A.angleOffsetAdjust`) to the servo's memory. Normally, after the servo is powered off, it loses its angle offset, but after using this command, it will remember.
+Permanently writes the angle offset (set by [`LX16A.angleOffsetAdjust()`](#lx16aangleoffsetadjustoffset)) to the servo's memory. Normally, after the servo is powered off, it loses its angle offset, but after using this command, it will remember.
 
 #### Parameters
 None
