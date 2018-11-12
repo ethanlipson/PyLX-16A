@@ -39,8 +39,8 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.tempMaxLimitRead() - Returns the maximum legal temperature of the servo
 * LX16A.tempRead() - Returns the current temperature of the servo
 * LX16A.vInRead() - Returns the current input voltage to the servo
-* LX16A.getPhysicalPos() - Returns the current physical position of the servo
-* LX16A.getVirtualPos() - Returns the current virtual position of the servo
+* [LX16A.getPhysicalPos()](#lx16agetphysicalpos) - Returns the current physical position of the servo
+* [LX16A.getVirtualPos()](#lx16agetvirtualpos) - Returns the current virtual position of the servo
 * LX16A.servoMotorModeRead() - Returns whether the servo is in servo or motor mode
 * LX16A.loadOrUnloadRead() - Returns whether the servo is loaded or unloaded
 * LX16A.LEDCtrlRead() - Returns whether the LED is on or off
@@ -474,4 +474,50 @@ None
 #### Possible Errors
 If either `lower` or `upper` is out of range, or if `lower` >= `upper`, then an exception will be raised.
 
+### LX16A.getPhysicalPos()
+Returns the physical position of the servo. This will sometimes differ from the commanded position of the servo if, for example, the servo's load is too big, or something is blocking it from rotating.
 
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+pos = servo1.getPhysicalPos()
+print("The servo's phyiscal position is {} degrees".format(pos))
+```
+
+#### Return Value
+Thy phyiscal position of the servo, between 0 and 240 degrees.
+
+#### Possible Errors
+None
+
+### LX16A.getVirtualPos()
+Returns the position that the servo is ***supposed*** to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
+
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+print("The servo is supposed to be at position {}.".format(servo1.getVirtualPos()))
+print("The servo is physically at position {}.".format(servo1.getPhysicalPos()))
+```
+
+#### Return Value
+The virtual position of the servo, between 0 and 240 degrees.
+
+#### Possible Errors
+None
