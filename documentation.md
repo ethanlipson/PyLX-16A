@@ -117,7 +117,7 @@ servo2 = LX16A(5)
 If the `ID` parameter is out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWrite(angle, time=0)
-Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The angle must be inside the bounds set by `LX16A.angleLimitWrite`.
+Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -125,7 +125,7 @@ Rotates the servo to the specified angle (in degrees) over the given time (in mi
 | angle     | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
 
-\* These values can be modified by `LX16A.angleLimitWrite`
+\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
 
 #### Example Program
 ```python
