@@ -147,10 +147,10 @@ servo2.moveTimeWrite(200, 3000)
 None
 
 #### Possible Errors
-If `angle` is outside of the bounds set by `LX16A.angleLimitWrite`, or if `time` is out of range, a `ServoError` will be raised.
+If `angle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWaitWrite(angle, time=0)
-Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called. The angle must be inside the bounds set by `LX16A.angleLimitWrite`.
+Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -158,7 +158,7 @@ Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediatel
 | angle     | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
 
-\* These values can be modified by `LX16A.angleLimitWrite`
+\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
 
 #### Example Program
 ```python
@@ -183,10 +183,10 @@ servo1.moveStart()
 None
 
 #### Possible Errors
-If `angle` is outside of the bounds set by `LX16A.angleLimitWrite`, or if `time` is out of range, a `ServoError` will be raised.
+If `angle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out of range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWriteRel(relAngle, time=0)
-Rotates the servo relative to its current angle (in degrees) over the specified time (in seconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The absolute angle must be inside the bounds set by `LX16A.angleLimitWrite`.
+Rotates the servo relative to its current angle (in degrees) over the specified time (in seconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -194,7 +194,7 @@ Rotates the servo relative to its current angle (in degrees) over the specified 
 | relAngle  | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
 
-\* These values can be modified by `LX16A.angleLimitWrite`
+\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
 
 #### Example Program
 ```python
@@ -219,10 +219,10 @@ servo1.moveTimeWriteRel(30)
 None
 
 #### Possible Errors
-If the servo's current angle plus `relAngle` is outside of the bounds set by `LX16A.angleLimitWrite`, or if `time` is out range, a `ServoError` will be raised.
+If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
 
 ### LX16A.moveTimeWaitWriteRel(relAngle, time=0)
-Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called. The absolute angle must be inside the bounds set by `LX16A.angleLimitWrite`.
+Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when `LX16A.moveStart` or `LX16A.moveStartAll` is called. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
@@ -230,7 +230,7 @@ Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immedia
 | relAngle  | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
 
-\* These values can be modified by `LX16A.angleLimitWrite`
+\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
 
 #### Example Program
 ```python
@@ -258,7 +258,7 @@ servo1.moveStart()
 None
 
 #### Possible Errors
-If the servo's current angle plus `relAngle` is outside of the bounds set by `LX16A.angleLimitWrite`, or if `time` is out range, a `ServoError` will be raised.
+If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
 
 ### LX16A.moveStart()
 Rotates the servo by the angle specified by LX16A.moveTimeWaitWrite, or by the the angle specified by moveTimeWaitWriteRel (relative to the servo's current angle), over the specified time.
