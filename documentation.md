@@ -512,8 +512,8 @@ LX16A.initialize("COM3")
 
 servo1 = LX16A(1)
 
-print("The servo is supposed to be at position {}.".format(servo1.getVirtualPos()))
-print("The servo is physically at position {}.".format(servo1.getPhysicalPos()))
+print("The servo is supposed to be at position", servo1.getVirtualPos())
+print("The servo is physically at position", servo1.getPhysicalPos())
 ```
 
 #### Return Value
