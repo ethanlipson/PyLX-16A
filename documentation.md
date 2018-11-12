@@ -563,7 +563,7 @@ The physical position of the servo, between 0 and 240 degrees.
 None
 
 ### LX16A.getVirtualPos()
-Returns the position that the servo is ***supposed*** to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
+Returns the position that the servo is **supposed** to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
 
 #### Parameters
 None
