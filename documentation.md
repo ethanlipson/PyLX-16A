@@ -553,7 +553,7 @@ LX16A.initialize("COM3")
 servo1 = LX16A(1)
 
 pos = servo1.getPhysicalPos()
-print("The servo's phyiscal position is {} degrees".format(pos))
+print("The servo's physical position is {} degrees".format(pos))
 ```
 
 #### Return Value
