@@ -24,7 +24,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * [LX16A.vInLimitWrite(lower, upper)](#lx16avinlimitwritelower-upper) - Adjusts the servo's input voltage limits
 * LX16A.tempMaxLimitWrite(temp) - Adjusts the servo's maximum temperature limit
 * [LX16A.motorMode(speed)](#lx16amotormodespeed) - Switches the servo to motor mode, and makes it rotate at the specified speed
-* LX16A.servoMode() - Switches the servo to servo mode
+* [LX16A.servoMode()](#lx16aservomode) - Switches the servo to servo mode
 * LX16A.loadOrUnloadWrite(power) - Turns the servo on or off
 * LX16A.LEDCtrlWrite(power) - Turns the servo's LED on or off
 * LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
@@ -507,6 +507,9 @@ None
 
 #### Possible Errors
 If `speed` is out of bounds, a `ServoError` will be raised.
+
+### LX16A.servoMode()
+Reverts the servo back to servo mode (from motor mode, discussed in [`LX16A.motorMode()`](#lx16amotormodespeed).
 
 ### LX16A.getPhysicalPos()
 Returns the physical position of the servo. This will sometimes differ from the commanded position of the servo if, for example, the servo's load is too big, or something is blocking it from rotating.
