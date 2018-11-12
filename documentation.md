@@ -47,7 +47,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.LEDErrorRead() - Returns which error conditions will cause the LED to flash
 
 ### Global Commands
-* LX16A.moveStartAll() - Rotates all servos at once (if they have parameters set by [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel`](#lx16amovetimewaitwriterelrelangle-time0).
+* LX16A.moveStartAll() - Rotates all servos at once (if they have parameters set by [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0).
 * LX16A.moveStopAll() - Halts all servo movement
 * LX16A.moveTimeWriteList(servos, data) - Moves multiple servos simultaneously, each with distinct parameters
 * LX16A.moveTimeWriteListRel(servos, data) - Moves multiple servos simultaneously, each with distinct parameters, and with relative angles
