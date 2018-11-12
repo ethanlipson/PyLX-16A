@@ -511,6 +511,33 @@ If `speed` is out of bounds, a `ServoError` will be raised.
 ### LX16A.servoMode()
 Reverts the servo back to servo mode (from motor mode, discussed in [`LX16A.motorMode()`](#lx16amotormodespeed).
 
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+# Switch the servo to servo mode. rotating at half speed
+servo1.motorMode(500)
+time.sleep(1)
+
+# Switch the servo back to servo mode
+servo1.servoMode()
+servo1.moveTimeWrite(60)
+```
+
+#### Return Value
+None
+
+#### Possible Errors
+None
+
 ### LX16A.getPhysicalPos()
 Returns the physical position of the servo. This will sometimes differ from the commanded position of the servo if, for example, the servo's load is too big, or something is blocking it from rotating.
 
