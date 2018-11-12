@@ -155,8 +155,10 @@ Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediatel
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
-| angle     | `int` | 0           | 240         |
+| angle     | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
+
+\* These values can be modified by `LX16A.angleLimitWrite`
 
 #### Example Program
 ```python
@@ -189,8 +191,10 @@ Rotates the servo relative to its current angle (in degrees) over the specified 
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
-| relAngle  | `int` | 0           | 240         |
+| relAngle  | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
+
+\* These values can be modified by `LX16A.angleLimitWrite`
 
 #### Example Program
 ```python
@@ -223,8 +227,10 @@ Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immedia
 #### Parameters
 | Parameter | Type  | Lower Bound | Upper Bound |
 | --------- | ----- | ----------- | ----------- |
-| relAngle  | `int` | 0           | 240         |
+| relAngle  | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
+
+\* These values can be modified by `LX16A.angleLimitWrite`
 
 #### Example Program
 ```python
