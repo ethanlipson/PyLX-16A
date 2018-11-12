@@ -493,7 +493,7 @@ print("The servo's phyiscal position is {} degrees".format(pos))
 ```
 
 #### Return Value
-Thy phyiscal position of the servo, between 0 and 240 degrees.
+The phyiscal position of the servo, between 0 and 240 degrees.
 
 #### Possible Errors
 None
