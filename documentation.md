@@ -125,7 +125,7 @@ Rotates the servo to the specified angle (in degrees) over the given time (in mi
 | angle     | `int` | 0*          | 240*        |
 | time      | `int` | 0           | 30000       |
 
-* These values can be modified by `LX16A.angleLimitWrite`
+\* These values can be modified by `LX16A.angleLimitWrite`
 
 #### Example Program
 ```python
