@@ -30,7 +30,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 * LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
 
 ### Read Commands
-* LX16A.moveTimeRead() - Returns the parameters to the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0)
+* [LX16A.moveTimeRead()](#lx16amovetimeread) - Returns the parameters to the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0)
 * LX16A.moveTimeWaitRead() - Returns the parameters to the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0)
 * LX16A.IDRead() - Returns the servo's ID
 * LX16A.angleOffsetRead() - Returns the servo's angle offset
@@ -538,6 +538,33 @@ None
 #### Possible Errors
 None
 
+### LX16A.moveTimeRead()
+Returns the parameters of the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0). This includes calls to [`LX16A.moveTimeWriteRel()`](#lx16amovetimewriterelrelangle-time0) (in this case, the returned angle will be absolute).
+
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+servo1.moveTimeWrite(180, 500)
+
+params = servo1.moveTimeRead()
+print("Angle: {}, time: {}".format(*params))
+```
+
+#### Return Value
+A list containing two `int`s, the first being the angle, and the second being the time.
+
+#### Possible Errors
+None
+
 ### LX16A.getPhysicalPos()
 Returns the physical position of the servo. This will sometimes differ from the commanded position of the servo if, for example, the servo's load is too big, or something is blocking it from rotating.
 
@@ -563,7 +590,7 @@ The physical position of the servo, between 0 and 240 degrees.
 None
 
 ### LX16A.getVirtualPos()
-Returns the position that the servo is **supposed** to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
+Returns the position that the servo is *supposed* to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
 
 #### Parameters
 None
