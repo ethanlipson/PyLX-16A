@@ -31,7 +31,7 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 
 ### Read Commands
 * [LX16A.moveTimeRead()](#lx16amovetimeread) - Returns the parameters to the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0)
-* LX16A.moveTimeWaitRead() - Returns the parameters to the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0)
+* [LX16A.moveTimeWaitRead()](#lx16amovetimewaitread) - Returns the parameters to the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0)
 * LX16A.IDRead() - Returns the servo's ID
 * LX16A.angleOffsetRead() - Returns the servo's angle offset
 * LX16A.angleLimitRead() - Returns the servo's angle limits
@@ -547,7 +547,6 @@ None
 #### Example Program
 ```python
 from lx16a import *
-import time
 
 LX16A.initialize("COM3")
 
@@ -556,6 +555,37 @@ servo1 = LX16A(1)
 servo1.moveTimeWrite(180, 500)
 
 params = servo1.moveTimeRead()
+print("Angle: {}, time: {}".format(*params))
+```
+
+#### Return Value
+A list containing two `int`s, the first being the angle, and the second being the time.
+
+#### Possible Errors
+None
+
+### LX16A.moveTimeWaitRead()
+Returns the parameters of the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0). This includes calls to [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0) (in this case, the returned angle will be absolute).
+
+#### Parameters
+None
+
+#### Example Program
+```python
+from lx16a import *
+import time
+
+LX16A.initialize("COM3")
+
+servo1 = LX16A(1)
+
+servo1.moveTimeWaitWrite(180, 500)
+
+time.sleep(1)
+
+servo1.moveStart()
+
+params = servo1.moveTimeWaitRead()
 print("Angle: {}, time: {}".format(*params))
 ```
 
