@@ -15,6 +15,9 @@ import weakref
 class ServoError(Exception):
 	pass
 
+class ServoTimeout(Exception):
+	pass
+
 class LX16A:
 	controller = None
 	servos = set()
@@ -24,7 +27,7 @@ class LX16A:
 	
 	@staticmethod
 	def initialize(port):
-		LX16A.controller = serial.Serial(port=port, baudrate=115200)
+		LX16A.controller = serial.Serial(port=port, baudrate=115200, timeout=.01)
 	
 	def __init__(self, ID):
 		if ID < 0 or ID > 253:
@@ -63,7 +66,10 @@ class LX16A:
 	
 	@staticmethod
 	def checkPacket(packet):
+		if sum(packet) == 0:
+			raise ServoTimeout("Timeout")
 		if LX16A.checksum(packet[:-1]) != packet[-1]:
+			LX16A.controller.flushInput()
 			raise ServoError("Invalid checksum")
 	
 	@staticmethod
