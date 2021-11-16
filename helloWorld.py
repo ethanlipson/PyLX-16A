@@ -9,8 +9,13 @@ import time
 LX16A.initialize("/dev/ttyUSB0")
 
 # There should two servos connected, with IDs 1 and 2
-servo1 = LX16A(1)
-servo2 = LX16A(2)
+# If one isn't connected, an exception is thrown
+try:
+	servo1 = LX16A(1)
+	servo2 = LX16A(2)
+except ServoTimeout:
+	print("Servo not connected. Exiting...")
+	exit()
 
 t = 0
 
