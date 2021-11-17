@@ -32,6 +32,10 @@ class LX16A:
 	def initialize(port):
 		LX16A.controller = serial.Serial(port=port, baudrate=115200, timeout=.01)
 	
+	@staticmethod
+	def set_timeout(seconds):
+		LX16A.controller.timeout = seconds
+	
 	def __init__(self, ID):
 		if ID < 0 or ID > 253:
 			raise ServoError("Servo ID out of range")
