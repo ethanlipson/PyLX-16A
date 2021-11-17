@@ -18,6 +18,9 @@ class ServoError(Exception):
 class ServoTimeout(Exception):
 	pass
 
+class ServoChecksumError(Exception):
+	pass
+
 class LX16A:
 	controller = None
 	servos = set()
@@ -65,12 +68,12 @@ class LX16A:
 		LX16A.controller.write(packet)
 	
 	@staticmethod
-	def checkPacket(packet):
+	def checkPacket(packet, servo_id):
 		if sum(packet) == 0:
-			raise ServoTimeout("Timeout")
+			raise ServoTimeout(servo_id)
 		if LX16A.checksum(packet[:-1]) != packet[-1]:
 			LX16A.controller.flushInput()
-			raise ServoError("Invalid checksum")
+			raise ServoChecksumError(servo_id)
 	
 	@staticmethod
 	def getServos():
@@ -452,7 +455,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
 		data = list(map(lambda x: int(x * 6 / 25), data))
@@ -482,7 +485,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
 		data = list(map(lambda x: int(x * 6 / 25), data))
@@ -501,7 +504,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		data = returned[5]
 		
@@ -520,7 +523,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		offset = returned[5] - 256 if returned[5] > 127 else returned[5]
 		offset = int(offset * 6 / 25)
@@ -543,7 +546,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
 		data = [int(x * 6 / 25) for x in data]
@@ -564,7 +567,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		data = [returned[6] * 256 + returned[5], returned[8] * 256 + returned[7]]
 		
@@ -583,7 +586,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		return returned[5]
 	
@@ -599,7 +602,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		return returned[5]
 	
@@ -615,7 +618,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		return returned[6] * 256 + returned[5]
 	
@@ -636,7 +639,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		pos = returned[6] * 256 + returned[5]
 		pos = int(pos * 6 / 25)
@@ -660,7 +663,8 @@ class LX16A:
 		for i in range(10):
 			returned.append(LX16A.controller.read())
 		
-		LX16A.checkPacket([int.from_bytes(b, byteorder="little") for b in returned])
+		returned = [int.from_bytes(b, byteorder="little") for b in returned]
+		LX16A.checkPacket(returned, self.ID)
 		
 		if int.from_bytes(returned[5], byteorder="little") == 0:
 			return 0
@@ -687,7 +691,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		return returned[5]
 	
@@ -704,7 +708,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		return returned[5]
 	
@@ -731,7 +735,7 @@ class LX16A:
 			returned.append(LX16A.controller.read())
 		
 		returned = [int.from_bytes(b, byteorder="little") for b in returned]
-		LX16A.checkPacket(returned)
+		LX16A.checkPacket(returned, self.ID)
 		
 		temp = int(bool(returned[5] & 1))
 		volt = int(bool(returned[5] & 2))
