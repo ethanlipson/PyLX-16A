@@ -13,7 +13,9 @@ import weakref
 # http://effbot.org/pyfaq/how-do-i-get-a-list-of-all-instances-of-a-given-class.htm
 
 class ServoError(Exception):
-	pass
+	def __init__(self, ID, reason):
+		super().__init__(reason)
+		self.ID = ID
 
 class ServoTimeout(ServoError):
 	pass
@@ -41,7 +43,7 @@ class LX16A:
 	
 	def __init__(self, ID):
 		if ID < 0 or ID > 253:
-			raise ServoArgumentError(f"Servo {self.ID}: Servo ID out of range")
+			raise ServoArgumentError(ID, f"Servo {self.ID}: Servo ID out of range")
 		
 		self.ID = ID
 		self.angle = self.getPhysicalPos()
@@ -63,7 +65,7 @@ class LX16A:
 	@staticmethod
 	def toBytes(n):
 		if n < 0 or n > 65535:
-			raise ServoArgumentError(f"Input out of range")
+			raise ServoArgumentError(None, f"Input out of range")
 		
 		return [n & 255, n // 256]
 	
@@ -75,12 +77,12 @@ class LX16A:
 		LX16A.controller.write(packet)
 	
 	@staticmethod
-	def checkPacket(packet, servo_id):
+	def checkPacket(packet, ID):
 		if sum(packet) == 0:
-			raise ServoTimeout(servo_id)
+			raise ServoTimeout(ID, f"Servo {ID} is not responding")
 		if LX16A.checksum(packet[:-1]) != packet[-1]:
 			LX16A.controller.flushInput()
-			raise ServoChecksumError(servo_id)
+			raise ServoChecksumError(ID, f"Bad checksum from servo {ID}")
 	
 	@staticmethod
 	def getServos():
@@ -107,9 +109,9 @@ class LX16A:
 	
 	def moveTimeWrite(self, angle, time=0):
 		if angle < self.lowerLimit or angle > self.upperLimit:
-			raise ServoArgumentError(f"Servo {self.ID}: Angle out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Angle out of range")
 		if time < 0 or time > 30000:
-			raise ServoArgumentError(f"Servo {self.ID}: Time out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Time out of range")
 		
 		self.angle = angle
 		
@@ -127,9 +129,9 @@ class LX16A:
 	
 	def moveTimeWaitWrite(self, angle, time=0):
 		if angle < self.lowerLimit or angle > self.upperLimit:
-			raise ServoArgumentError(f"Servo {self.ID}: Angle out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Angle out of range")
 		if time < 0 or time > 30000:
-			raise ServoArgumentError(f"Servo {self.ID}: Time out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Time out of range")
 		
 		self.waitingAngle = angle
 		
@@ -170,7 +172,7 @@ class LX16A:
 	
 	def IDWrite(self, ID):
 		if ID < 0 or ID > 253:
-			raise ServoArgumentError(f"Servo {self.ID}: ID out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: ID out of range")
 		
 		packet = [0x55, 0x55, self.ID, 4, 13, ID]
 		LX16A.sendPacket(packet)
@@ -192,7 +194,7 @@ class LX16A:
 	
 	def angleOffsetAdjust(self, offset):
 		if offset < -30 or offset > 30:
-			raise ServoArgumentError(f"Servo {self.ID}: Offset out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Offset out of range")
 		
 		angle = int(angle * 25 / 6)
 		
@@ -226,11 +228,11 @@ class LX16A:
 	
 	def angleLimitWrite(self, lower, upper):
 		if lower < 0 or lower > 240:
-			raise ServoArgumentError(f"Servo {self.ID}: Lower bound out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Lower bound out of range")
 		if upper < 0 or upper > 240:
-			raise ServoArgumentError(f"Servo {self.ID}: Upper bound out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Upper bound out of range")
 		if lower >= upper:
-			raise ServoArgumentError(f"Servo {self.ID}: Lower bound must be less than upper bound")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Lower bound must be less than upper bound")
 		
 		self.lowerLimit = lower
 		self.upperLimit = upper
@@ -251,11 +253,11 @@ class LX16A:
 	
 	def vInLimitWrite(self, lower, upper):
 		if lower < 4500 or lower > 12000:
-			raise ServoArgumentError(f"Servo {self.ID}: Lower bound out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Lower bound out of range")
 		if upper < 4500 or upper > 12000:
-			raise ServoArgumentError(f"Servo {self.ID}: Upper bound out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Upper bound out of range")
 		if lower >= upper:
-			raise ServoArgumentError(f"Servo {self.ID}: Lower bound must be less than upper bound")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Lower bound must be less than upper bound")
 		
 		packet = [0x55, 0x55, self.ID, 7, 22, *LX16A.toBytes(lower), *LX16A.toBytes(upper)]
 		LX16A.sendPacket(packet)
@@ -270,7 +272,7 @@ class LX16A:
 	
 	def tempMaxLimitWrite(self, temp):
 		if temp < 50 or temp > 100:
-			raise ServoArgumentError(f"Servo {self.ID}: Temperature limit out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Temperature limit out of range")
 		
 		packet = [0x55, 0x55, self.ID, 4, 24, temp]
 		LX16A.sendPacket(packet)
@@ -296,7 +298,7 @@ class LX16A:
 	
 	def motorMode(self, speed):
 		if speed < -1000 or speed > 1000:
-			raise ServoArgumentError(f"Servo {self.ID}: Speed out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Speed out of range")
 		
 		if speed < 0:
 			speed += 65536
@@ -315,7 +317,7 @@ class LX16A:
 	
 	def loadOrUnloadWrite(self, power):
 		if power != 0 and power != 1:
-			raise ServoArgumentError(f"Servo {self.ID}: Power must be 0 or 1")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Power must be 0 or 1")
 		
 		packet = [0x55, 0x55, self.ID, 4, 31, power]
 		LX16A.sendPacket(packet)
@@ -328,7 +330,7 @@ class LX16A:
 	
 	def LEDCtrlWrite(self, power):
 		if power != 0 and power != 1:
-			raise ServoArgumentError(f"Servo {self.ID}: Power must be 0 or 1")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Power must be 0 or 1")
 		
 		packet = [0x55, 0x55, self.ID, 4, 33, power]
 		LX16A.sendPacket(packet)
@@ -410,7 +412,7 @@ class LX16A:
 	
 	def moveTimeWriteRel(self, relAngle, time=0):
 		if self.angle + relAngle < self.lowerLimit or self.angle + relAngle > self.upperLimit:
-			raise ServoArgumentError(f"Servo {self.ID}: Absolute angle out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Absolute angle out of range")
 		
 		self.moveTimeWrite(self.angle + relAngle, time)
 	
@@ -419,7 +421,7 @@ class LX16A:
 	
 	def moveTimeWaitWriteRel(self, relAngle, time=0):
 		if self.angle + relAngle < self.lowerLimit or self.angle + relAngle > self.upperLimit:
-			raise ServoArgumentError(f"Servo {self.ID}: Absolute angle out of range")
+			raise ServoArgumentError(self.ID, f"Servo {self.ID}: Absolute angle out of range")
 		
 		self.moveTimeWaitWrite(self.angle + relAngle, time)
 	

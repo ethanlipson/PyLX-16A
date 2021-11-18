@@ -8,9 +8,10 @@ NOTE: In this document, I make a distinction between the physical servo and the 
 
 ### Exceptions
 * ServoError - Base exception for the library
-* ServoTimeout - Exception for timeout issues
-* ServoArgumentError - Exception for bad arguments
-* ServoChecksumError - Exception for bad checksums
+  * "ID" member variable is the ID of the errant servo
+* ServoTimeout - Exception for timeout issues, inherits from ServoError
+* ServoArgumentError - Exception for bad arguments, inherits from ServoError
+* ServoChecksumError - Exception for bad checksums, inherits from ServoError
 
 ### Initialization Functions
 * [LX16A.initialize(port)](#lx16ainitializeport) - Initializes the connection between the computer and the servo controller board
