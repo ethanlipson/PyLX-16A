@@ -1,651 +1,895 @@
 # PyLX-16A Documentation
 
-This is the documentation for the Python library PyLX16A, a library for controlling LewanSoul's LX-16A servos. To get started with using them, read `userGuide.md`. This document specifies all of the functionality of the library, so I would recommend reading the User Guide first.
+This document details the features of the library. For a quickstart guide, refer to `readme.md`.
 
-NOTE: In this document, I make a distinction between the physical servo and the virtual servo object. In any program using PyLX16A, there should be a one-to-one correspondence between virtual servo objects and physical servos.
+### General notes
 
-## Reference Guide
+- Getter methods ending in `hw` physically query the servo.
+- This library throws exceptions instead of silently failing, as it's important to remember that servos can be dangerous if not handled responsibly. Meaning:
+  - Out-of-bounds arguments raise an exception. They are not clamped.
+  - Attempting to rotate the servo with torque disabled will raise an exception.
+- If you are working in a high-stakes environment, you may want to initialize servo objects with torque disabled just to be safe.
+
+## Table of Contents
 
 ### Exceptions
-* ServoError - Base exception for the library
-  * "ID" member variable is the ID of the errant servo
-* ServoTimeout - Exception for timeout issues, inherits from ServoError
-* ServoArgumentError - Exception for bad arguments, inherits from ServoError
-* ServoChecksumError - Exception for bad checksums, inherits from ServoError
 
-### Initialization Functions
-* [LX16A.initialize(port)](#lx16ainitializeport) - Initializes the connection between the computer and the servo controller board
-* [LX16A.\_\_init\_\_(ID)](#lx16a__init__id) - Creates a servo object
+- `ServoError` - Base exception for the library
+  - `ServoTimeoutError` - Exception for timeout issues
+  - `ServoChecksumError` - Exception for bad checksums
+  - `ServoArgumentError` - Exception for bad arguments
+  - `ServoLogicalError` - Exception for out-of-order commands
+    - e.g. `get_motor_speed()` while not in motor mode, `move()` while torque is disabled
 
-### Write Commands
-* [LX16A.moveTimeWrite(angle, time=0)](#lx16amovetimewriteangle-time0) - Rotates the servo to the specified angle over the specified time
-* [LX16A.moveTimeWaitWrite(angle, time=0)](#lx16amovetimewaitwriteangle-time0) - Sets an angle and time to be rotated to later
-* [LX16A.moveTimeWriteRel(relAngle, time=0)](#lx16amovetimewriterelrelangle-time0) - Rotates the servo to the specified relative angle over the specified time
-* [LX16A.moveTimeWaitWriteRel(relAngle, time=0)](#lx16amovetimewaitwriterelrelangle-time0) - Sets a relative angle and time to be rotated to later
-* [LX16A.moveStart()](#lx16amovestart) - Begins servo rotation (to be with [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0))
-* [LX16A.moveStop()](#lx16amovestop) - Halts the servo's rotation
-* [LX16A.IDWrite(ID)](#lx16aidwriteid) - Modifies the servo's ID
-* [LX16A.angleOffsetAdjust(offset)](#lx16aangleoffsetadjustoffset) - Adjusts the servo's position offset
-* [LX16A.angleOffsetWrite()](#lx16aangleoffsetwrite) - Permanently writes the servo's position offset to memory
-* [LX16A.angleLimitWrite(lower, upper)](#lx16aanglelimitwritelower-upper) - Adjusts the servo's angle boundaries
-* [LX16A.vInLimitWrite(lower, upper)](#lx16avinlimitwritelower-upper) - Adjusts the servo's input voltage limits
-* LX16A.tempMaxLimitWrite(temp) - Adjusts the servo's maximum temperature limit
-* [LX16A.motorMode(speed)](#lx16amotormodespeed) - Switches the servo to motor mode, and makes it rotate at the specified speed
-* [LX16A.servoMode()](#lx16aservomode) - Switches the servo to servo mode
-* LX16A.loadOrUnloadWrite(power) - Turns the servo on or off
-* LX16A.LEDCtrlWrite(power) - Turns the servo's LED on or off
-* LX16A.LEDErrorWrite(temp, volt, lock) - Adjusts whether the servo's LED will flash if an error occurs
+Since the last four exceptions inherit from `ServoError`, they can all be caught using `except ServoError`.
 
-### Read Commands
-* [LX16A.moveTimeRead()](#lx16amovetimeread) - Returns the parameters to the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0)
-* [LX16A.moveTimeWaitRead()](#lx16amovetimewaitread) - Returns the parameters to the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0)
-* LX16A.IDRead() - Returns the servo's ID
-* LX16A.angleOffsetRead() - Returns the servo's angle offset
-* LX16A.angleLimitRead() - Returns the servo's angle limits
-* LX16A.vInLimitRead() - Returns the maximum legal input voltage to the servo
-* LX16A.tempMaxLimitRead() - Returns the maximum legal temperature of the servo
-* LX16A.tempRead() - Returns the current temperature of the servo
-* LX16A.vInRead() - Returns the current input voltage to the servo
-* [LX16A.getPhysicalPos()](#lx16agetphysicalpos) - Returns the current physical position of the servo
-* [LX16A.getVirtualPos()](#lx16agetvirtualpos) - Returns the current virtual position of the servo
-* LX16A.servoMotorModeRead() - Returns whether the servo is in servo or motor mode
-* LX16A.loadOrUnloadRead() - Returns whether the servo is loaded or unloaded
-* LX16A.LEDCtrlRead() - Returns whether the LED is on or off
-* LX16A.LEDErrorRead() - Returns which error conditions will cause the LED to flash
+All servo exceptions have an `id_` member variable containing the errant servo's ID.
 
-### Global Commands
-* LX16A.moveStartAll() - Rotates all servos at once (if they have parameters set by [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0) or [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0).
-* LX16A.moveStopAll() - Halts all servo movement
-* LX16A.moveTimeWriteList(servos, data) - Moves multiple servos simultaneously, each with distinct parameters
-* LX16A.moveTimeWriteListRel(servos, data) - Moves multiple servos simultaneously, each with distinct parameters, and with relative angles
-* LX16A.getServos() - Returns a list of all `LX16A` objects in existence
+### Initialization
 
-## Documentation
+- [`LX16A.initialize`](#lx16ainitialize) - Initialize the class with the bus controller's port
+- [`LX16A.__init__`](#lx16a__init__) - LX16A object constructor
 
-### LX16A.initialize(port)
-Initiates the connection between the computer and the servo controller board. No other commands will work if this function is not called.
+### Setter member functions
 
-#### Parameters
-| Parameter | Type   |
-| --------- | ------ |
-| port      | `str`  |
+- [`LX16A.move`](#lx16amove) - Rotate the servo
+- [`LX16A.move_bspline`](#lx16amove_bspline) - Sample a point on a B-spline curve to move to, set by [`LX16A.set_bspline`](#lx16aset_bspline)
+- [`LX16A.move_start`](#lx16amove_start) - Begin a delayed servo move if set by [`LX16A.move(..., wait=True)`](#lx16amove)
+- [`LX16A.move_stop`](#lx16amove_stop) - Halt servo movement
+- [`LX16A.set_id`](#lx16aset_id) - Give the servo a new ID (changes the virtual servo's ID to match)
+- [`LX16A.set_angle_offset`](#lx16aset_angle_offset) - Set an angle offset applied to all move commands
+- [`LX16A.set_angle_limits`](#lx16aset_angle_limits) - Set angle limits to servo rotation
+- [`LX16A.set_vin_limits`](#lx16aset_vin_limits) - Set input voltage limits
+- [`LX16A.set_temp_limit`](#lx16aset_temp_limit) - Set temperature limits in degrees Celsius
+- [`LX16A.motor_mode`](#lx16amotor_mode) - Switch the servo to motor mode and set its rotation speed
+- [`LX16A.servo_mode`](#lx16aservo_mode) - Switch the servo to servo mode
+- [`LX16A.enable_torque`](#lx16aenable_torque) - Allow the servo to produce torque and prevent it from easily giving to external forces
+- [`LX16A.disable_torque`](#lx16adisable_torque) - Prevent the servo from producing torque and allow it to easily give to external forces
+- [`LX16A.led_power_on`](#lx16aled_power_on) - Light up the servo's LED
+- [`LX16A.led_power_off`](#lx16aled_power_off) - Shut off the servo's LED
+- [`LX16A.set_led_error_triggers`](#lx16aset_led_error_triggers) - Set what conditions cause the servo's LED to flash
+- [`LX16A.set_bspline`](#lx16aset_bspline) - Set the servo's B-spline to be used by [`LX16A.move_bspline`](#lx16amove_bspline)
 
-#### Example Programs
-Windows
-```python
-from lx16a import *
+### Getter member functions
 
-# To find the port on Windows, try COM1, COM2, COM3, COM4, etc.
+- [`LX16A.get_last_instant_move_hw`](#lx16aget_last_instant_move_hw) - Get the angle and time of the last call to [`LX16A.move(..., wait=False)`](#lx16amove)
+- [`LX16A.get_last_delayed_move_hw`](#lx16aget_last_delayed_move_hw) - Get the angle and time of the last call to [`LX16A.move(..., wait=True)`](#lx16amove)
+- [`LX16A.get_id`](#lx16aget_id) - Get the ID of the servo (to avoid making a physical query, servo.id\_ can be used instead)
+- [`LX16A.get_angle_offset`](#lx16aget_angle_offset) - Get the servo's angle offset
+- [`LX16A.get_angle_limits`](#lx16aget_angle_limits) - Get the servo's angle limits
+- [`LX16A.get_vin_limits`](#lx16aget_vin_limits) - Get the servo's input voltage limits
+- [`LX16A.get_temp_limit`](#lx16aget_temp_limit) - Get the servo's temperature limit in degrees Celsius
+- [`LX16A.is_motor_mode`](#lx16ais_motor_mode) - Check if the servo is in motor mode
+- [`LX16A.get_motor_speed`](#lx16aget_motor_speed) - If the servo is in motor mode, get its speed
+- [`LX16A.is_torque_enabled`](#lx16ais_torque_enabled) - Check if the servo is allowed to produce torque
+- [`LX16A.is_led_power_on`](#lx16ais_led_power_on) - Check if the servo's LED is currently enabled
+- [`LX16A.get_led_error_triggers`](#lx16aget_led_error_triggers) - Check what conditions will cause the servo's LED to flash
+- [`LX16A.get_temp`](#lx16aget_temp) - Get the servo's current temperature
+- [`LX16A.get_vin`](#lx16aget_vin) - Get the servo's current input voltage
+- [`LX16A.get_physical_angle`](#lx16aget_physical_angle) - Get the servo's physical angle
+- [`LX16A.get_commanded_angle`](#lx16aget_commanded_angle) - Get the servo's commanded angle
+- [`LX16A.get_waiting_angle`](#lx16aget_waiting_angle) - Get the servo's waiting angle, if set by [`LX16A.move(..., wait=True)`](#lx16amove)
 
-# This program initializes the controller board on the port COM3
-LX16A.initialize("COM3")
-```
+# Function Documentation
 
-Linux
-```python
-from lx16a import *
+## LX16A.initialize
 
-# To find the port on Windows, go to the directory /dev/ in the terminal,
-# and type `ls`. This will list all available ports, so try all of them
+`@staticmethod LX16A.initialize(port: str) -> None`
 
-# This program initializes the controller board on the port /dev/ttyUSB0
-LX16A.initialize("/dev/ttyUSB0")
-```
-
-#### Return Value
-None
-
-#### Possible Errors
-If the port does not exist, a `SerialException` will be raised.
-
-### LX16A.\_\_init\_\_(ID)
-Each physical servo has an ID number associated with it, between 0 and 253. Virtual servos also have an ID associated with them, and when a command is called in the code, this command affects the physical servo with the same ID. A servo's physical ID can be set programmatically or through LewanSoul's Bus Servo Terminal software.
+Initializes the LX16A class with the servo bus controller's port.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| ID        | `int` | 0           | 253         |
 
-#### Example Program
-```python
-from lx16a import *
+| Parameter | Type | Default Value | Range | Description           |
+| --------- | ---- | ------------- | ----- | --------------------- |
+| port      | str  | Required      | N?A   | Servo controller port |
 
-LX16A.initialize("COM3")
+#### Return value
 
-# Creates two virtual servo objects, with IDs 1 and 5
-servo1 = LX16A(1)
-servo2 = LX16A(5)
-```
+None
 
-#### Return Value
-`LX16A` object
+#### Exceptions
 
-#### Possible Errors
-If the `ID` parameter is out of range, a `ServoError` will be raised.
+None
 
-### LX16A.moveTimeWrite(angle, time=0)
-Rotates the servo to the specified angle (in degrees) over the given time (in milliseconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+## LX16A.\_\_init\_\_
+
+`LX16A.__init__(self, id_: int, disable_torque: bool = False) -> None`
+
+Servo object constructor.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| angle     | `int` | 0*          | 240*        |
-| time      | `int` | 0           | 30000       |
 
-\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
+| Parameter      | Type | Default Value | Range       | Description                                         |
+| -------------- | ---- | ------------- | ----------- | --------------------------------------------------- |
+| id\_           | int  | Required      | 0 - 253     | Servo ID                                            |
+| disable_torque | bool | False         | True, False | If True, the servo initializes with torque disabled |
 
-#### Example Program
-```python
-from lx16a import *
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-servo2 = LX16A(2)
-
-# Rotates servo1 to its halfway position
-servo1.moveTimeWrite(120)
-
-# Rotates servo2 to 200 degrees over 3 seconds
-servo2.moveTimeWrite(200, 3000)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If `angle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out of range, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.moveTimeWaitWrite(angle, time=0)
-Similar to LX16A.moveTimeWrite, except that the servo does not rotate immediately. Instead, it rotates by the angle and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll()`](#lx16amovestartall) is called. The angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+- `ServoArgumentError`
+  - If the servo ID is outside the range 0 - 253
+
+## LX16A.move
+
+`LX16A.move(angle: float, time: float = 0, relative: bool = False, wait: bool = False) -> None`
+
+Move the servo to the specified angle, with options to control rotation duration, relativity, and delay.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| angle     | `int` | 0*          | 240*        |
-| time      | `int` | 0           | 30000       |
 
-\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
+| Parameter | Type  | Default Value | Range             | Description                                                            |
+| --------- | ----- | ------------- | ----------------- | ---------------------------------------------------------------------- |
+| angle     | float | Required      | 0&deg; - 240&deg; | Target angle in degrees                                                |
+| time      | int   | 0             | 0 - 30000         | Rotation duration in milliseconds                                      |
+| relative  | bool  | False         | True, False       | Determines if the `angle` parameter is relative                        |
+| wait      | bool  | False         | True, False       | Delays movement until [`LX16A.move_start`](#lx16amove_start) is called |
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Stores angle=180 and time=2000 in servo1
-servo1.moveTimeWaitWrite(180, 2000)
-
-# Sleep for one second
-time.sleep(1)
-
-# Starts rotation of the servo
-servo1.moveStart()
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If `angle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out of range, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.moveTimeWriteRel(relAngle, time=0)
-Rotates the servo relative to its current angle (in degrees) over the specified time (in seconds). If the time argument is 0, the servo will rotate as fast as it can, but it will not be instant. If no time argument is given, it will be assumed to be 0. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+- `ServoArgumentError`
+  - If the angle is outside the range 0&deg; - 240&deg;
+  - If the angle is outside the range set by [`LX16A.set_angle_limits`](#lx16aset_angle_limits)
+- `ServoLogicalError`
+  - If the command is issued while in motor mode
+  - If the command is issued while torque is disabled
+
+## LX16A.move_bspline
+
+`LX16A.move_bspline(x: float, time: int = 0, wait: bool = False) -> None`
+
+Samples a point on the B-spline curve set by [`LX16A.set_bspline`](#lx16aset_bspline) and moves to it. Note that this does not sample using the parameter, but effectively finds the parameter corresponding to the input x-value and moves to its matching y-value.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| relAngle  | `int` | 0*          | 240*        |
-| time      | `int` | 0           | 30000       |
 
-\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
+| Parameter | Type  | Default Value | Range                                                  | Description                                                            |
+| --------- | ----- | ------------- | ------------------------------------------------------ | ---------------------------------------------------------------------- |
+| x         | float | Required      | Determined by [`LX16A.set_bspline`](#lx16aset_bspline) | B-spline sample x-value                                                |
+| time      | int   | 0             | 0 - 30000                                              | Rotation duration in milliseconds                                      |
+| wait      | bool  | False         | True, False                                            | Delays movement until [`LX16A.move_start`](#lx16amove_start) is called |
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Rotate the servo to 120 degrees
-servo1.moveTimeWrite(120)
-
-# Wait for the servo to finish rotating
-time.sleep(1)
-
-# Rotate by 30 degrees to an absolute angle of 150 degrees
-servo1.moveTimeWriteRel(30)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.moveTimeWaitWriteRel(relAngle, time=0)
-Similar to LX16A.moveTimeWriteRel, except that the servo does not rotate immediately. Instead, it rotates by the angle (relative to its current angle) and time when [`LX16A.moveStart()`](#lx16amovestart) or [`LX16A.moveStartAll()`](#lx16amovestartall) is called. The absolute angle must be inside the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper).
+- `ServoLogicalError`
+  - If no B-spline has been set by [`LX16A.set_bspline`](#lx16aset_bspline)
+
+## LX16A.move_start
+
+`LX16A.move_start() -> None`
+
+If a movement command has been set by [`LX16A.move(..., wait=True)`](#lx16amove), running this command will execute it.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| relAngle  | `int` | 0*          | 240*        |
-| time      | `int` | 0           | 30000       |
 
-\* These values can be modified by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper)
-
-#### Example Program
-```python
-from lx16a import *
-import time
-
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Rotate the servo to 120 degrees
-servo1.moveTimeWrite(120)
-
-# Stores relAngle=30 and time=2000 in servo1
-servo1.moveTimeWaitWriteRel(30, 2000)
-
-# Wait for the servo to finish rotating
-time.sleep(1)
-
-# Rotate by the stored angle and time
-servo1.moveStart()
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If the servo's current angle plus `relAngle` is outside of the bounds set by [`LX16A.angleLimitWrite()`](#lx16aanglelimitwritelower-upper), or if `time` is out range, a `ServoError` will be raised.
+#### Return value
 
-### LX16A.moveStart()
-Rotates the servo by the angle specified by [LX16A.moveTimeWaitWrite()](#lx16amovetimewaitwriteangle-time0), or by the the angle specified by [moveTimeWaitWriteRel()](#lx16amovetimewaitwriterelangle-time0) (relative to the servo's current angle), over the specified time.
+None
+
+#### Exceptions
+
+- `ServoLogicalError`
+  - If no move command has been set by [`LX16A.move(..., wait=True)`](#lx16amove)
+  - If the command is issued while in motor mode
+  - If the command is issued while torque is disabled
+
+## LX16A.move_stop
+
+`LX16A.move_stop() -> None`
+
+Halts the servo's movement.
 
 #### Parameters
+
 None
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Stores angle=180 and time=2000 in servo1
-servo1.moveTimeWaitWrite(180, 2000)
-
-# Sleep for one second
-time.sleep(1)
-
-# Starts rotation of the servo
-servo1.moveStart()
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-None
+#### Exceptions
 
-### LX16A.moveStop()
-Halts the servo's movement. Both [`LX16A.getPhysicalPos()`](#lx16agetphysicalpos) and [`LX16A.getVirtualPos()`](#lx16agetvirtualpos) will still be accurate after this function is called.
+- `ServoLogicalError`
+  - If the command is issued while in motor mode
+
+## LX16A.set_id
+
+`LX16A.set_id(id_: int) -> None`
+
+Gives the servo a new ID. The class instance's internal ID is updated as well, so there shouldn't be any hiccups.
+
+Use this command with care. Many difficulties can arise from two servos having the same ID.
 
 #### Parameters
+
+| Parameter | Type | Default Value | Range | Description  |
+| --------- | ---- | ------------- | ----- | ------------ |
+| id\_      | int  | Required      | 0-253 | New servo ID |
+
+#### Return value
+
 None
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Exceptions
 
-LX16A.initialize("COM3")
+- `ServoArgumentError`
+  - If the ID is outside the range 0 - 253
 
-servo1 = LX16A(1)
+## LX16A.set_angle_offset
 
-servo1.moveTimeWrite(180, 5000)
+`LX16A.set_angle_offset(offset: int, permanent: bool = False) -> None`
 
-time.sleep(2)
-
-# Halts the servos movement, wherever it is
-servo1.moveStop()
-```
-
-#### Return Value
-None
-
-#### Possible Errors
-None
-
-### LX16A.IDWrite(ID)
-Changes the ID of the physical servo as well as the servo object. After calling this function, the servo object will still work, but future servo objects referencing this physical servo will have to be aware of the ID change.
+Creates an offset for move commands. All angle readings will automatically correct for the offset, so you can essentially forget that it's there.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| ID        | `int` | 0           | 253         |
 
-#### Example Program
-```python
-from lx16a import *
+| Parameter | Type | Default Value | Range              | Description                                |
+| --------- | ---- | ------------- | ------------------ | ------------------------------------------ |
+| offset    | int  | Required      | -30&deg; - 30&deg; | New rotation angle offset in degrees       |
+| permanent | bool | False         | True, False        | If True, saves the offset across shutdowns |
 
-LX16A.initialize("COM3")
+#### Return value
 
-servo1 = LX16A(1)
-
-# Changes servo1's ID to 4
-servo1.IDWrite(4)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If `ID` is out of range, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.angleOffsetAdjust(offset)
-Adds a constant offset (in degrees) to the servo's position. In a situation where the physical servo was placed a few degrees in a certain direction, this command could be used to adjust for that error. The offset does not adjust the virtual servo's angle. When the servo is powered off, this offset is erased from its memory. It is possible to achieve a negative angle using this command, by having the offset plus the virtual angle be negative. To permanently set an offset, follow this command with [`LX16A.angleOffsetWrite()`](#lx16aangleoffsetwrite).
+- `ServoArgumentError`
+  - If the offset is outside the range -30&deg; - 30&deg;
 
-NOTE: This command may affect the return value of [`LX16A.getPhysicalPos()`](#lx16agetphysicalpos) and [`LX16A.getVirtualPos()`](#lx16agetvirtualpos).
+## LX16A.set_angle_limits
+
+`LX16A.set_angle_limits(lower_limit: float, upper_limit: float) -> None`
+
+Creates lower and upper angle limits for move commands. If these limits are violated, an exception is thrown.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| offset    | `int` | -125        | 125         |
 
-#### Example Program
-```python
-from lx16a import *
+| Parameter   | Type  | Default Value | Range             | Description                  |
+| ----------- | ----- | ------------- | ----------------- | ---------------------------- |
+| lower_limit | float | Required      | 0&deg; - 240&deg; | Lower angle limit in degrees |
+| upper_limit | float | Required      | 0&deg; - 240&deg; | Upper angle limit in degrees |
 
-LX16A.initialize("COM3")
+#### Return value
 
-servo1 = LX16A(1)
-
-# Sets the servo's offset to -4 degrees
-servo1.angleOffsetAdjust(-4)
-
-# Rotates to 120 degrees, but if the offset is taken into account,
-# the servo is really at 116 degrees
-servo1.moveTimeWrite(120)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If `offset` is out of range, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.angleOffsetWrite()
-Permanently writes the angle offset (set by [`LX16A.angleOffsetAdjust()`](#lx16aangleoffsetadjustoffset)) to the servo's memory. Normally, after the servo is powered off, it loses its angle offset, but after using this command, it will remember.
+- `ServoArgumentError`
+  - If either limit is outside the range 0&deg; - 240&deg;
+  - If the upper limit is less than the lower limit
+
+## LX16A.set_vin_limits
+
+`LX16A.set_vin_limits(lower_limit: int, upper_limit: int) -> None`
+
+Creates lower and upper voltage limits for the servo. If these limits are violated AND the voltage condition has been enabled using [`set_led_error_triggers`](#lx16aset_led_error_triggers), the servo's LED will flash.
 
 #### Parameters
+
+| Parameter   | Type  | Default Value | Range        | Description                             |
+| ----------- | ----- | ------------- | ------------ | --------------------------------------- |
+| lower_limit | float | Required      | 4500 - 12000 | Lower input voltage limit in millivolts |
+| upper_limit | float | Required      | 4500 - 12000 | Upper input voltage limit in millivolts |
+
+#### Return value
+
 None
 
-#### Example Program
-```python
-from lx16a import *
+#### Exceptions
 
-LX16A.initialize("COM3")
+- `ServoArgumentError`
+  - If either limit is outside the range 4500 - 12000 millivolts
+  - If the upper limit is less than the lower limit
 
-servo1 = LX16A(1)
+## LX16A.set_temp_limit
 
-# Set the angle offset to 22 degrees
-servo1.angleOffsetAdjust(22)
-servo1.angleOffsetWrite()
+`LX16A.set_temp_limit(upper_limit: int) -> None`
 
-# Power the servo off and on again
-# ...
-
-# Write 90 degrees to the servo, but since it still remembers the offset,
-# the servo is really at 112 degrees (90 + 22 degrees)
-servo1.angleOffsetWrite(90)
-```
-
-#### Return Value
-None
-
-#### Possible Errors
-None
-
-### LX16A.angleLimitWrite(lower, upper)
-Sets the upper and lower limits for the servo's position. By default, these values are at their limits, 0 and 240 degrees. Note that the lower bound must be strictly less than the upper bound. If you attempt to rotate the servo to a position out of bounds, it will rotate but stop at its limits. If the servo's position is out of bounds set by this command, the servo will be able to rotate back into the legal range, but not back out.
+Creates an upper temperature limit for the servo. If this limit violated AND the temperature condition has been enabled using [`set_led_error_triggers`](#lx16aset_led_error_triggers), the servo's LED will flash.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| lower     | `int` | 0           | 240         |
-| upper     | `int` | 0           | 240         |
 
-#### Example Program
-```python
-from lx16a import *
-import time
+| Parameter   | Type | Default Value | Range    | Description                          |
+| ----------- | ---- | ------------- | -------- | ------------------------------------ |
+| upper_limit | int  | Required      | 50 - 100 | Temperature limit in degrees Celsius |
 
-LX16A.initialize("COM3")
+#### Return value
 
-servo1 = LX16A(1)
-
-servo1.moveTimeWrite(120)
-
-time.sleep(1)
-
-servo1.angleLimitWrite(60, 180)
-
-# This command works
-servo1.moveTimeWrite(90)
-
-# This one does not
-# servo1.moveTimeWrite(210)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If either `lower` or `upper` is out of range, or if `lower` >= `upper`, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.vInLimitWrite(lower, upper)
-Sets the lower and upper limits (in millivolts) for the voltage going into the servo. If the voltage goes outside of these bounds, then the servo will stop working, and the LED will flash. Note that the lower bound must be strictly less than the upper bound.
+- `ServoArgumentError`
+  - If the limit is outside the range 50 &deg;C - 100 &deg;C
+
+## LX16A.motor_mode
+
+`LX16A.motor_mode(speed: int) -> None`
+
+Switches the servo to motor mode, where the rotation speed is controlled instead of the angle.
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| lower     | `int` | 4500        | 12000       |
-| upper     | `int` | 4500        | 12000       |
 
-#### Example Program
-```python
-from lx16a import *
+| Parameter | Type | Default Value | Range        | Description          |
+| --------- | ---- | ------------- | ------------ | -------------------- |
+| speed     | int  | Required      | -1000 - 1000 | Motor rotation speed |
 
-LX16A.initialize("COM3")
+#### Return value
 
-servo1 = LX16A(1)
-
-# Normal range
-servo1.vInLimitWrite(6000, 10000)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If either `lower` or `upper` is out of range, or if `lower` >= `upper`, a `ServoError` will be raised.
+#### Exceptions
 
-### LX16A.motorMode(speed)
-Commands the servo to start continously rotating (like a motor), at a speed between -1000 and 1000 (0 is still, 1000 is full speed, and -1000 is full speed in the opposite direction).
+- `ServoArgumentError`
+  - If the motor speed is outside the range -1000 - 1000
+- `ServoLogicalError`
+  - If torque is disabled
+
+## LX16A.servo_mode
+
+`LX16A.servo_mode() -> None`
+
+Switches the servo to servo mode (from motor mode).
 
 #### Parameters
-| Parameter | Type  | Lower Bound | Upper Bound |
-| --------- | ----- | ----------- | ----------- |
-| speed     | `int` | -1000       | 1000        |
 
-#### Example Program
-```python
-from lx16a import *
-import time
-
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Have the servo rotate back and forth, changing direction every seccond
-while True:
-  # Set the servo rotating at full speed
-  servo1.motorMode(1000)
-  time.sleep(1)
-  
-  # Set the servo rotating at full speed, but backwards
-  servo1.motorMode(-1000)
-  time.sleep(1)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-If `speed` is out of bounds, a `ServoError` will be raised.
+#### Return value
 
-### LX16A.servoMode()
-Reverts the servo back to servo mode (from motor mode, discussed in [`LX16A.motorMode()`](#lx16amotormodespeed).
+None
+
+#### Exceptions
+
+None
+
+## LX16A.enable_torque
+
+`LX16A.enable_torque() -> None`
+
+Allows the servo to produce torque and stops it from being rotated manually.
 
 #### Parameters
+
 None
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-# Switch the servo to servo mode. rotating at half speed
-servo1.motorMode(500)
-time.sleep(1)
-
-# Switch the servo back to servo mode
-servo1.servoMode()
-servo1.moveTimeWrite(60)
-```
-
-#### Return Value
 None
 
-#### Possible Errors
-None
+#### Exceptions
 
-### LX16A.moveTimeRead()
-Returns the parameters of the last call to [`LX16A.moveTimeWrite()`](#lx16amovetimewriteangle-time0). This includes calls to [`LX16A.moveTimeWriteRel()`](#lx16amovetimewriterelrelangle-time0) (in this case, the returned angle will be absolute).
+- `ServoLogicalError`
+  - If torque is already enabled
+
+## LX16A.disable_torque
+
+`LX16A.disable_torque() -> None`
+
+Prevents the servo from producing torque and lets it be rotated manually, essentially reversing [`LX16A.enable_torque`](#lx16aenable_torque).
 
 #### Parameters
+
 None
 
-#### Example Program
-```python
-from lx16a import *
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-servo1.moveTimeWrite(180, 500)
-
-params = servo1.moveTimeRead()
-print("Angle: {}, time: {}".format(*params))
-```
-
-#### Return Value
-A list containing two `int`s, the first being the angle, and the second being the time.
-
-#### Possible Errors
 None
 
-### LX16A.moveTimeWaitRead()
-Returns the parameters of the last call to [`LX16A.moveTimeWaitWrite()`](#lx16amovetimewaitwriteangle-time0). This includes calls to [`LX16A.moveTimeWaitWriteRel()`](#lx16amovetimewaitwriterelrelangle-time0) (in this case, the returned angle will be absolute).
+#### Exceptions
+
+- `ServoLogicalError`
+  - If torque is already disabled
+
+## LX16A.led_power_on
+
+`LX16A.led_power_on() -> None`
+
+Powers on the servo's LED. Note that even if this function is not called, the LED will still flash if any of the error conditions set by [`LX16A.set_led_error_triggers`](#lx16aset_led_error_triggers) are met.
 
 #### Parameters
+
 None
 
-#### Example Program
-```python
-from lx16a import *
-import time
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-servo1.moveTimeWaitWrite(180, 500)
-
-time.sleep(1)
-
-servo1.moveStart()
-
-params = servo1.moveTimeWaitRead()
-print("Angle: {}, time: {}".format(*params))
-```
-
-#### Return Value
-A list containing two `int`s, the first being the angle, and the second being the time.
-
-#### Possible Errors
 None
 
-### LX16A.getPhysicalPos()
-Returns the physical position of the servo. This will sometimes differ from the commanded position of the servo if, for example, the servo's load is too big, or something is blocking it from rotating.
+#### Exceptions
+
+None
+
+## LX16A.led_power_off
+
+`LX16A.led_power_off() -> None`
+
+Powers off the servo's LED. Note that even if this function is called, the LED will still flash if any of the error conditions set by [`LX16A.set_led_error_triggers`](#lx16aset_led_error_triggers) are met.
 
 #### Parameters
+
 None
 
-#### Example Program
-```python
-from lx16a import *
+#### Return value
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-pos = servo1.getPhysicalPos()
-print("The servo's physical position is {} degrees".format(pos))
-```
-
-#### Return Value
-The physical position of the servo, between 0 and 240 degrees.
-
-#### Possible Errors
 None
 
-### LX16A.getVirtualPos()
-Returns the position that the servo is *supposed* to be at. The servo will usually physically be at this position, but if it is preventing from fully rotating because of a large load (for example), then its physical position will be different.
+#### Exceptions
+
+None
+
+## LX16A.set_led_error_triggers
+
+`LX16A.set_led_error_triggers(over_temperature: bool, over_voltage: bool, rotor_locked: bool) -> None`
+
+Sets what error conditions will cause the servo's LED to flash.
 
 #### Parameters
+
+| Parameter        | Type | Default Value | Range       | Description                                                                |
+| ---------------- | ---- | ------------- | ----------- | -------------------------------------------------------------------------- |
+| over_temperature | bool | Required      | True, False | If True, the servo's LED will flash if the temperature limit is exceeded   |
+| over_voltage     | bool | Required      | True, False | If True, the servo's LED will flash if the input voltage limit is exceeded |
+| rotor_locked     | bool | Required      | True, False | If True, the servo's LED will flash if the rotor is locked                 |
+
+#### Return value
+
 None
 
-#### Example Program
-```python
-from lx16a import *
+#### Exceptions
 
-LX16A.initialize("COM3")
-
-servo1 = LX16A(1)
-
-print("The servo is supposed to be at position", servo1.getVirtualPos())
-print("The servo is physically at position", servo1.getPhysicalPos())
-```
-
-#### Return Value
-The virtual position of the servo, between 0 and 240 degrees.
-
-#### Possible Errors
 None
+
+## LX16A.set_bspline
+
+`set_bspline(knots: list[float], control_points: list[tuple[float, float]], degree: int, num_samples: int = 100) -> None`
+
+Set the servo's B-spline to be used by [`LX16A.move_bspline`](#lx16amove_bspline).
+
+#### Parameters
+
+| Parameter      | Type                      | Default Value | Range | Description                                                                  |
+| -------------- | ------------------------- | ------------- | ----- | ---------------------------------------------------------------------------- |
+| knots          | list[float]               | Required      | N/A   | B-spline knots                                                               |
+| control_points | list[tuple[float, float]] | Required      | N/A   | B-spline control points                                                      |
+| degree         | int                       | Required      | N/A   | B-spline degree                                                              |
+| num_samples    | int                       | 100           | > 0   | Number of samples used to compute [`LX16A.move_bspline`](#lx16amove_bspline) |
+
+#### Return value
+
+None
+
+#### Exceptions
+
+- `ServoArgumentError`
+  - `len(knots) != len(control_points) - degree + 1`
+
+## LX16A.get_last_instant_move_hw
+
+`LX16A.get_last_instant_move_hw() -> tuple[float, int]`
+
+Gets the `angle` and `time` parameters from the most recent call to [`LX16A.move(..., wait=False)`](#lx16amove).
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Index | Type  | Range             | Description                       |
+| ----- | ----- | ----------------- | --------------------------------- |
+| 0     | float | 0&deg; - 240&deg; | Target angle in degrees           |
+| 1     | int   | 0 - 30000         | Rotation duration in milliseconds |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_last_delayed_move_hw
+
+`LX16A.get_last_delayed_move_hw() -> tuple[float, int]`
+
+Gets the `angle` and `time` parameters from the most recent call to [`LX16A.move(..., wait=True)`](#lx16amove).
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Index | Type  | Range             | Description                       |
+| ----- | ----- | ----------------- | --------------------------------- |
+| 0     | float | 0&deg; - 240&deg; | Target angle in degrees           |
+| 1     | int   | 0 - 30000         | Rotation duration in milliseconds |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_id
+
+`LX16A.get_id(poll_hardware: bool = False) -> int`
+
+Gets the servo's ID. Set by [`LX16A.set_id`](#lx16aset_id).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range | Description  |
+| ---- | ----- | ------------ |
+| int  | 0-253 | New servo ID |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_angle_offset
+
+`LX16A.get_angle_offset(poll_hardware: bool = False) -> int`
+
+Gets the servo's angle offset. Set by [`LX16A.set_angle_offset`](#lx16aset_angle_offset)
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range              | Description                          |
+| ---- | ------------------ | ------------------------------------ |
+| int  | -30&deg; - 30&deg; | New rotation angle offset in degrees |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_angle_limits
+
+`LX16A.get_angle_limits(poll_hardware: bool = False) -> tuple[float, float]`
+
+Gets the servo's angle limits. Set by [`LX16A.set_angle_limits`](#lx16aset_angle_limits).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Index | Type  | Range             | Description                  |
+| ----- | ----- | ----------------- | ---------------------------- |
+| 0     | float | 0&deg; - 240&deg; | Lower angle limit in degrees |
+| 1     | float | 0&deg; - 240&deg; | Upper angle limit in degrees |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_vin_limits
+
+`LX16A.get_vin_limits(poll_hardware: bool = False) -> tuple[int, int]`
+
+Gets the servo's input voltage limits. Set by [`LX16A.set_vin_limits`](#lx16aset_vin_limits).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Index | Type  | Range        | Description                             |
+| ----- | ----- | ------------ | --------------------------------------- |
+| 0     | float | 4500 - 12000 | Lower input voltage limit in millivolts |
+| 1     | float | 4500 - 12000 | Upper input voltage limit in millivolts |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_temp_limit
+
+`LX16A.get_temp_limit(poll_hardware: bool = False) -> int`
+
+Gets the servo's temperature limit. Set by [`LX16A.set_temp_limit`](#lx16aset_temp_limit).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range    | Description                          |
+| ---- | -------- | ------------------------------------ |
+| int  | 50 - 100 | Temperature limit in degrees Celsius |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.is_motor_mode
+
+`LX16A.is_motor_mode(poll_hardware: bool = False) -> bool`
+
+Checks if the servo is in motor mode. Set by [`LX16A.motor_mode`](#lx16amotor_mode) and [`LX16A.servo_mode`](#lx16aservo_mode).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range       | Description                               |
+| ---- | ----------- | ----------------------------------------- |
+| bool | True, False | Whether or not the servo is in motor mode |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_motor_speed
+
+`LX16A.get_motor_speed(poll_hardware: bool = False) -> int`
+
+If the servo is in motor mode, gets its speed. Set by [`LX16A.motor_mode`](#lx16amotor_mode).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range        | Description          |
+| ---- | ------------ | -------------------- |
+| int  | -1000 - 1000 | Motor rotation speed |
+
+#### Exceptions
+
+- `ServoLogicalError`
+  - If the servo is not in motor mode
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.is_torque_enabled
+
+`LX16A.is_torque_enabled(poll_hardware: bool = False) -> bool`
+
+Check if the servo can produce torque. Set by [`LX16A.enable_torque`](#lx16aenable_torque) and [`LX16A.disable_torque`](#lx16adisable_torque).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range       | Description                        |
+| ---- | ----------- | ---------------------------------- |
+| bool | True, False | Whether or not the servo is loaded |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.is_led_power_on
+
+`LX16A.is_led_power_on(poll_hardware: bool = False) -> bool`
+
+Checks if the servo's LED is powered on. Set by [`LX16A.led_power_off`](#lx16aled_power_on) and [`LX16A.led_power_off`](#lx16aled_power_off).
+
+Note that the servo's LED will flash regardless of the LED's power state if any of the error conditions set by [`LX16A.set_led_error_triggers`](#lx16aset_led_error_triggers) are met.
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Type | Range       | Description                               |
+| ---- | ----------- | ----------------------------------------- |
+| bool | True, False | Whether or not the servo's LED is enabled |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_led_error_triggers
+
+`LX16A.get_led_error_triggers(poll_hardware: bool = False) -> tuple[bool, bool, bool]`
+
+Checks what error conditions will cause the servo's LED to flash. Set by [`LX16A.set_led_error_triggers`](#lx16aset_led_error_triggers).
+
+#### Parameters
+
+| Parameter     | Type | Default Value | Range       | Description                                                    |
+| ------------- | ---- | ------------- | ----------- | -------------------------------------------------------------- |
+| poll_hardware | bool | False         | True, False | If true, queries the servo instead of returning internal value |
+
+#### Return value
+
+| Index | Type | Range       | Description                                                                |
+| ----- | ---- | ----------- | -------------------------------------------------------------------------- |
+| 0     | bool | True, False | If True, the servo's LED will flash if the temperature limit is exceeded   |
+| 1     | bool | True, False | If True, the servo's LED will flash if the input voltage limit is exceeded |
+| 2     | bool | True, False | If True, the servo's LED will flash if the rotor is locked                 |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_temp
+
+`LX16A.get_temp() -> int`
+
+Gets the temperature of the servo in degrees Celsius.
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type | Range | Description                                        |
+| ---- | ----- | -------------------------------------------------- |
+| int  | ℤ     | The servo's current temperature in degrees Celsius |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_vin
+
+`LX16A.get_vin() -> int`
+
+Gets the input voltage of the servo in millivolts.
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type | Range | Description                                     |
+| ---- | ----- | ----------------------------------------------- |
+| int  | ℕ     | The servo's current input voltage in millivolts |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_physical_angle
+
+`LX16A.get_physical_angle() -> float`
+
+Gets the physical angle of the servo. Note that this angle may not be equal to the commanded angle ([`LX16A.get_commanded_angle`](#lx16aget_commanded_angle)), such as in the case of excessive load.
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type  | Range             | Description                           |
+| ----- | ----------------- | ------------------------------------- |
+| float | 0&deg; - 240&deg; | The servo's physical angle in degrees |
+
+#### Exceptions
+
+- `ServoTimeoutError`
+  - If the program receives less bytes than expected
+- `ServoChecksumError`
+  - If the program receives a bad checksum
+
+## LX16A.get_commanded_angle
+
+`LX16A.get_commanded_angle() -> float`
+
+Gets the commanded angle of the servo.
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type  | Range             | Description                            |
+| ----- | ----------------- | -------------------------------------- |
+| float | 0&deg; - 240&deg; | The servo's commanded angle in degrees |
+
+#### Exceptions
+
+None
+
+## LX16A.get_waiting_angle
+
+`LX16A.get_waiting_angle() -> float`
+
+Gets the servo's waiting angle, if set by [`LX16A.move(..., wait=True)`](#lx16amove).
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type  | Range             | Description                          |
+| ----- | ----------------- | ------------------------------------ |
+| float | 0&deg; - 240&deg; | The servo's waiting angle in degrees |
+
+#### Exceptions
+
+- `ServoLogicalError`
+  - If no move has been set by [`LX16A.move(..., wait=True)`](#lx16amove)
