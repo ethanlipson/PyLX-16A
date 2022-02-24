@@ -449,7 +449,7 @@ class LX16A:
 
         received = LX16A._read_packet(1, self._id)
         if received[0] > 125:
-            return received[0] - 256
+            return LX16A._from_servo_range(received[0] - 256)
 
         return LX16A._from_servo_range(received[0])
 
