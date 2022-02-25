@@ -8,12 +8,31 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QRadioButton,
     QCheckBox,
+    QPushButton,
+    QMessageBox,
 )
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIntValidator
 import serial.tools.list_ports
+import serial.serialutil
 from pylx16a.lx16a import *
 import sys
+
+
+def catch_disconnection(func):
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as e:
+            if isinstance(e, serial.serialutil.SerialException):
+                self.disable_widgets()
+                self.clear_servo()
+                self.port_refresh_button_clicked(None)
+                QMessageBox.critical(None, "Error", "Disconnected from device")
+            else:
+                QMessageBox.information(None, "Error", str(e))
+
+    return wrapper
 
 
 class MainWindow(QMainWindow):
@@ -24,15 +43,24 @@ class MainWindow(QMainWindow):
 
         self.port_selection_box = QComboBox(self)
         self.port_selection_box.setFixedSize(200, 27)
-        self.port_selection_box.move(30, 55)
+        self.port_selection_box.move(30, 65)
         port_selection_box_label = QLabel("Select Port:", self)
-        port_selection_box_label.move(30, 30)
+        port_selection_box_label.move(30, 35)
+
+        self.port_selection_box_refresh_button = QPushButton("Refresh", self)
+        self.port_selection_box_refresh_button.setFixedSize(60, 23)
+        self.port_selection_box_refresh_button.move(170, 38)
 
         self.id_selection_box = QListWidget(self)
         self.id_selection_box.setFixedSize(200, 200)
-        self.id_selection_box.move(30, 130)
-        id_selection_box_label = QLabel("Available IDs:", self)
+        self.id_selection_box.move(30, 135)
+        id_selection_box_label = QLabel("Connected Servos:", self)
+        id_selection_box_label.setFixedWidth(200)
         id_selection_box_label.move(30, 105)
+
+        self.id_selection_box_refresh_button = QPushButton("Refresh", self)
+        self.id_selection_box_refresh_button.setFixedSize(60, 23)
+        self.id_selection_box_refresh_button.move(170, 108)
 
         self.set_id_line_edit = QLineEdit(self)
         self.set_id_line_edit.setFixedSize(50, 27)
@@ -41,11 +69,21 @@ class MainWindow(QMainWindow):
         set_id_line_edit_label.move(30, 355)
         set_id_line_edit_label.setFixedSize(50, 27)
 
+        self.set_id_button = QPushButton("Change ID!", self)
+        self.set_id_button.setFixedSize(85, 27)
+        self.set_id_button.move(145, 355)
+
         self.position_slider = QSlider(Qt.Orientation.Horizontal, self)
         self.position_slider.setMinimum(0)
         self.position_slider.setMaximum(240)
         self.position_slider.setFixedWidth(200)
         self.position_slider.move(300, 55)
+        self.position_slider_readout = QLabel("0.00°", self)
+        self.position_slider_readout.setFixedWidth(50)
+        self.position_slider_readout.move(450, 30)
+        self.position_slider_readout.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
         position_slider_label = QLabel("Angle (degrees):", self)
         position_slider_label.move(300, 30)
 
@@ -54,6 +92,12 @@ class MainWindow(QMainWindow):
         self.position_offset_slider.setMaximum(30)
         self.position_offset_slider.setFixedWidth(200)
         self.position_offset_slider.move(300, 125)
+        self.position_offset_slider_readout = QLabel("0.00°", self)
+        self.position_offset_slider_readout.setFixedWidth(50)
+        self.position_offset_slider_readout.move(450, 100)
+        self.position_offset_slider_readout.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
         position_offset_slider_label = QLabel("Angle offset (degrees):", self)
         position_offset_slider_label.setFixedWidth(200)
         position_offset_slider_label.move(300, 100)
@@ -154,156 +198,54 @@ class MainWindow(QMainWindow):
         self.position_slider.setValue(0)
         self.position_offset_slider.setValue(0)
         self.motor_speed_slider.setValue(0)
+        self.id_selection_box_refresh_button.setEnabled(False)
         self.disable_widgets()
 
-        self.port_selection_box.currentTextChanged.connect(self.scan_for_servos)
-        self.port_selection_box.currentTextChanged.connect(self.disable_widgets)
-        self.port_selection_box.currentTextChanged.connect(self.clear_servo)
-        self.id_selection_box.currentTextChanged.connect(self.enable_widgets)
-        self.id_selection_box.currentTextChanged.connect(self.set_servo_id)
-        self.set_id_line_edit.returnPressed.connect(self.id_updated)
-        self.position_slider.sliderMoved.connect(
-            lambda pos: self.active_servo.move(pos)
+        self.port_selection_box.currentTextChanged.connect(
+            self.port_selection_box_changed
         )
+        self.port_selection_box_refresh_button.clicked.connect(
+            self.port_refresh_button_clicked
+        )
+        self.id_selection_box.currentTextChanged.connect(self.id_selection_box_changed)
+        self.id_selection_box_refresh_button.clicked.connect(
+            self.id_refresh_button_clicked
+        )
+        self.set_id_button.pressed.connect(self.id_updated)
+        self.position_slider.sliderMoved.connect(self.position_slider_updated)
         self.position_offset_slider.sliderMoved.connect(
-            lambda offset: self.active_servo.set_angle_offset(offset, permanent=True)
+            self.position_offset_slider_updated
         )
         self.angle_lower_limit_textentry.textChanged.connect(
-            lambda text: self.active_servo.set_angle_limits(
-                int(text), self.active_servo.get_angle_limits()[1]
-            )
-            if text != ""
-            and int(text) >= 0
-            and int(text) <= 240
-            and int(text) < self.active_servo.get_angle_limits()[1]
-            else None
+            self.angle_lower_limit_updated
         )
         self.angle_upper_limit_textentry.textChanged.connect(
-            lambda text: self.active_servo.set_angle_limits(
-                self.active_servo.get_angle_limits()[0], int(text)
-            )
-            if text != ""
-            and int(text) >= 0
-            and int(text) <= 240
-            and int(text) > self.active_servo.get_angle_limits()[0]
-            else None
+            self.angle_upper_limit_updated
         )
-        self.vin_lower_limit_textentry.textChanged.connect(
-            lambda text: self.active_servo.set_vin_limits(
-                int(text), self.active_servo.get_vin_limits()[1]
-            )
-            if text != ""
-            and int(text) >= 4500
-            and int(text) <= 12000
-            and int(text) < self.active_servo.get_vin_limits()[1]
-            else None
-        )
-        self.vin_upper_limit_textentry.textChanged.connect(
-            lambda text: self.active_servo.set_vin_limits(
-                self.active_servo.get_vin_limits()[0], int(text)
-            )
-            if text != ""
-            and int(text) >= 4500
-            and int(text) <= 12000
-            and int(text) > self.active_servo.get_vin_limits()[0]
-            else None
-        )
-        self.temp_limit_textentry.textChanged.connect(
-            lambda text: self.active_servo.set_temp_limit(int(text))
-            if text != "" and int(text) >= 50 and int(text) <= 100
-            else None
-        )
+        self.vin_lower_limit_textentry.textChanged.connect(self.vin_lower_limit_updated)
+        self.vin_upper_limit_textentry.textChanged.connect(self.vin_upper_limit_updated)
+        self.temp_limit_textentry.textChanged.connect(self.temp_limit_updated)
         self.servo_mode_radio_button.toggled.connect(
-            lambda checked: (self.active_servo.servo_mode() if checked else None)
+            self.servo_mode_radio_button_toggled
         )
         self.motor_mode_radio_button.toggled.connect(
-            lambda checked: (
-                self.active_servo.motor_mode(self.motor_speed_slider.value())
-                if checked
-                else None
-            )
+            self.motor_mode_radio_button_toggled
         )
-        self.servo_mode_radio_button.toggled.connect(
-            lambda checked: (
-                checked
-                and (
-                    self.motor_speed_slider.setEnabled(False)
-                    or self.position_slider.setEnabled(True)
-                    or self.position_offset_slider.setEnabled(True)
-                )
-            )
-        )
-        self.motor_mode_radio_button.toggled.connect(
-            lambda checked: (
-                checked
-                and (
-                    self.motor_speed_slider.setEnabled(True)
-                    or self.position_slider.setEnabled(False)
-                    or self.position_offset_slider.setEnabled(False)
-                )
-            )
-        )
-        self.motor_speed_slider.valueChanged.connect(
-            lambda speed: (
-                self.active_servo.motor_mode(speed)
-                if self.motor_mode_radio_button.isChecked()
-                else None
-            )
-        )
+        self.motor_speed_slider.valueChanged.connect(self.motor_speed_slider_updated)
         self.torque_enabled_checkbox.stateChanged.connect(
-            lambda checked: (
-                self.active_servo.enable_torque()
-                if checked
-                else self.active_servo.disable_torque()
-            )
-        )
-        self.torque_enabled_checkbox.stateChanged.connect(
-            lambda checked: (
-                (
-                    self.position_slider.setEnabled(False)
-                    or self.position_offset_slider.setEnabled(False)
-                    or self.motor_speed_slider.setEnabled(False)
-                    or self.servo_mode_radio_button.setEnabled(False)
-                    or self.motor_mode_radio_button.setEnabled(False)
-                )
-                if not checked
-                else (
-                    self.servo_mode_radio_button.setEnabled(True)
-                    or self.motor_mode_radio_button.setEnabled(True)
-                    or (
-                        (
-                            self.motor_speed_slider.setEnabled(False)
-                            or self.position_slider.setEnabled(True)
-                            or self.position_offset_slider.setEnabled(True)
-                        )
-                        if self.servo_mode_radio_button.isChecked()
-                        else (
-                            self.motor_speed_slider.setEnabled(True)
-                            or self.position_slider.setEnabled(False)
-                            or self.position_offset_slider.setEnabled(False)
-                        )
-                    )
-                )
-            )
+            self.torque_enabled_checkbox_toggled
         )
         self.led_enabled_checkbox.stateChanged.connect(
-            lambda checked: (
-                self.active_servo.led_power_on()
-                if checked
-                else self.active_servo.led_power_off()
-            )
-        )
-        self.led_enabled_checkbox.stateChanged.connect(
-            self.set_led_error_triggers_enabled
+            self.led_enabled_checkbox_toggled
         )
         self.led_over_temp_checkbox.stateChanged.connect(
-            self.set_servo_led_error_triggers
+            self.led_error_triggers_checkbox_toggled
         )
         self.led_over_voltage_checkbox.stateChanged.connect(
-            self.set_servo_led_error_triggers
+            self.led_error_triggers_checkbox_toggled
         )
         self.led_rotor_locked_checkbox.stateChanged.connect(
-            self.set_servo_led_error_triggers
+            self.led_error_triggers_checkbox_toggled
         )
 
         self.scan_for_ports()
@@ -347,6 +289,7 @@ class MainWindow(QMainWindow):
     def clear_servo(self):
         self.active_servo = None
 
+    @catch_disconnection
     def set_servo_id(self, id_):
         if not id_.isdigit():
             return
@@ -355,7 +298,13 @@ class MainWindow(QMainWindow):
         self.active_servo.enable_torque()
 
         self.position_slider.setValue(int(self.active_servo.get_physical_angle()))
+        self.position_slider_readout.setText(
+            f"{int(self.active_servo.get_physical_angle() * 25 / 6) * 6 / 25:0.2f}°"
+        )
         self.position_offset_slider.setValue(int(self.active_servo.get_angle_offset()))
+        self.position_offset_slider_readout.setText(
+            f"{int(self.active_servo.get_angle_offset() * 25 / 6) * 6 / 25:0.2f}°"
+        )
         self.angle_lower_limit_textentry.setText(
             str(int(self.active_servo.get_angle_limits()[0]))
         )
@@ -381,7 +330,6 @@ class MainWindow(QMainWindow):
         self.motor_speed_slider.setEnabled(self.active_servo.is_motor_mode())
         self.torque_enabled_checkbox.setChecked(self.active_servo.is_torque_enabled())
         self.led_enabled_checkbox.setChecked(self.active_servo.is_led_power_on())
-        self.set_led_error_triggers_enabled(self.active_servo.is_led_power_on())
         self.led_over_temp_checkbox.setChecked(
             self.active_servo.get_led_error_triggers()[0]
         )
@@ -392,19 +340,10 @@ class MainWindow(QMainWindow):
             self.active_servo.get_led_error_triggers()[2]
         )
 
-    def set_servo_led_error_triggers(self):
-        self.active_servo.set_led_error_triggers(
-            self.led_over_temp_checkbox.isChecked(),
-            self.led_over_voltage_checkbox.isChecked(),
-            self.led_rotor_locked_checkbox.isChecked(),
-        )
-
-    def set_led_error_triggers_enabled(self, enabled):
-        self.led_over_temp_checkbox.setEnabled(enabled)
-        self.led_over_voltage_checkbox.setEnabled(enabled)
-        self.led_rotor_locked_checkbox.setEnabled(enabled)
-
+    @catch_disconnection
     def scan_for_servos(self, port):
+        self.setCursor(Qt.CursorShape.WaitCursor)
+
         LX16A.initialize(port)
 
         self.id_selection_box.clear()
@@ -416,28 +355,217 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
+        self.setCursor(Qt.CursorShape.ArrowCursor)
+
+    @catch_disconnection
     def scan_for_ports(self):
         ports = serial.tools.list_ports.comports()
         for port in ports:
             self.port_selection_box.addItem(port.device)
 
+    @catch_disconnection
     def update_readouts(self):
         if self.active_servo is None:
             return
 
         try:
             self.physical_position_readout.setText(
-                f"{int(self.active_servo.get_physical_angle())}°"
+                f"{self.active_servo.get_physical_angle():0.2f}°"
             )
             self.temperature_readout.setText(f"{self.active_servo.get_temp()} °C")
             self.voltage_readout.setText(f"{self.active_servo.get_vin() / 1000} V")
         except (ServoTimeoutError, ServoChecksumError):
             pass
 
+    @catch_disconnection
     def id_updated(self):
         new_id = self.set_id_line_edit.text()
-        self.active_servo.set_id(int(new_id))
-        self.id_selection_box.item(self.id_selection_box.currentRow()).setText(new_id)
+
+        try:
+            servo = LX16A(int(new_id))
+        except ServoTimeoutError:
+            # Meaning this ID is not taken
+            self.active_servo.set_id(int(new_id))
+            self.id_selection_box.item(self.id_selection_box.currentRow()).setText(
+                new_id
+            )
+
+            return
+
+        QMessageBox.warning(None, "Error", "ID already taken")
+
+    @catch_disconnection
+    def position_slider_updated(self, pos):
+        self.active_servo.move(pos)
+        self.position_slider_readout.setText(f"{int(pos * 25 / 6) * 6 / 25:0.2f}°")
+
+    @catch_disconnection
+    def position_offset_slider_updated(self, pos):
+        self.active_servo.set_angle_offset(pos)
+        self.position_offset_slider_readout.setText(
+            f"{int(pos * 25 / 6) * 6 / 25:0.2f}°"
+        )
+
+    @catch_disconnection
+    def angle_lower_limit_updated(self, text):
+        if (
+            QIntValidator(0, 240, self).validate(text, 0)
+            != QIntValidator.State.Acceptable
+        ):
+            return
+
+        if int(text) > int(self.angle_upper_limit_textentry.text()):
+            return
+
+        self.active_servo.set_angle_limits(
+            int(text), int(self.angle_upper_limit_textentry.text())
+        )
+
+    @catch_disconnection
+    def angle_upper_limit_updated(self, text):
+        if (
+            QIntValidator(0, 240, self).validate(text, 0)
+            != QIntValidator.State.Acceptable
+        ):
+            return
+
+        if int(text) < int(self.angle_lower_limit_textentry.text()):
+            return
+
+        self.active_servo.set_angle_limits(
+            int(self.angle_lower_limit_textentry.text()), int(text)
+        )
+
+    @catch_disconnection
+    def vin_lower_limit_updated(self, text):
+        if (
+            QIntValidator(4500, 12000, self).validate(text, 0)
+            != QIntValidator.State.Acceptable
+        ):
+            return
+
+        if int(text) > int(self.vin_upper_limit_textentry.text()):
+            return
+
+        self.active_servo.set_vin_limits(
+            int(text), int(self.vin_upper_limit_textentry.text())
+        )
+
+    @catch_disconnection
+    def vin_upper_limit_updated(self, text):
+        if (
+            QIntValidator(4500, 12000, self).validate(text, 0)
+            != QIntValidator.State.Acceptable
+        ):
+            return
+
+        if int(text) < int(self.vin_lower_limit_textentry.text()):
+            return
+
+        self.active_servo.set_vin_limits(
+            int(self.vin_lower_limit_textentry.text()), int(text)
+        )
+
+    @catch_disconnection
+    def temp_limit_updated(self, text):
+        if (
+            QIntValidator(50, 100, self).validate(text, 0)
+            != QIntValidator.State.Acceptable
+        ):
+            return
+
+        self.active_servo.set_temp_limit(int(text))
+
+    @catch_disconnection
+    def servo_mode_radio_button_toggled(self, checked):
+        if checked:
+            self.active_servo.servo_mode()
+            self.motor_speed_slider.setEnabled(False)
+            self.position_slider.setEnabled(True)
+            self.position_offset_slider.setEnabled(True)
+        else:
+            self.active_servo.motor_mode(int(self.motor_speed_slider.value()))
+            self.motor_speed_slider.setEnabled(True)
+            self.position_slider.setEnabled(False)
+            self.position_offset_slider.setEnabled(False)
+
+    @catch_disconnection
+    def motor_mode_radio_button_toggled(self, checked):
+        if checked:
+            self.active_servo.motor_mode(int(self.motor_speed_slider.value()))
+            self.motor_speed_slider.setEnabled(True)
+            self.position_slider.setEnabled(False)
+            self.position_offset_slider.setEnabled(False)
+        else:
+            self.active_servo.servo_mode()
+            self.motor_speed_slider.setEnabled(False)
+            self.position_slider.setEnabled(True)
+            self.position_offset_slider.setEnabled(True)
+
+    @catch_disconnection
+    def motor_speed_slider_updated(self, pos):
+        self.active_servo.motor_mode(pos)
+
+    @catch_disconnection
+    def torque_enabled_checkbox_toggled(self, checked):
+        if checked:
+            self.active_servo.enable_torque()
+        else:
+            self.active_servo.disable_torque()
+
+        self.position_slider.setEnabled(checked)
+        self.position_offset_slider.setEnabled(checked)
+        self.servo_mode_radio_button.setEnabled(checked)
+        self.motor_mode_radio_button.setEnabled(checked)
+        self.motor_speed_slider.setEnabled(checked)
+
+    @catch_disconnection
+    def led_enabled_checkbox_toggled(self, checked):
+        if checked:
+            self.active_servo.led_power_on()
+        else:
+            self.active_servo.led_power_off()
+
+    @catch_disconnection
+    def led_error_triggers_checkbox_toggled(self):
+        self.active_servo.set_led_error_triggers(
+            self.led_over_voltage_checkbox.isChecked(),
+            self.led_over_temp_checkbox.isChecked(),
+            self.led_rotor_locked_checkbox.isChecked(),
+        )
+
+    @catch_disconnection
+    def port_refresh_button_clicked(self, value):
+        self.id_selection_box_refresh_button.setEnabled(False)
+        self.disable_widgets()
+        self.port_selection_box.clear()
+        self.id_selection_box.clear()
+        self.scan_for_ports()
+
+    @catch_disconnection
+    def id_refresh_button_clicked(self, value):
+        self.disable_widgets()
+        self.id_selection_box.clear()
+        self.scan_for_servos(self.port_selection_box.currentText())
+
+    @catch_disconnection
+    def port_selection_box_changed(self, text):
+        if text == "":
+            return
+
+        self.id_selection_box_refresh_button.setEnabled(True)
+        self.disable_widgets()
+        self.id_selection_box.clear()
+        self.clear_servo()
+        self.scan_for_servos(text)
+
+    @catch_disconnection
+    def id_selection_box_changed(self, text):
+        if text == "":
+            return
+
+        self.enable_widgets()
+        self.set_servo_id(text)
 
 
 def main():
