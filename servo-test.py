@@ -1,3 +1,5 @@
+# Version 1.1.1
+
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -396,6 +398,14 @@ class MainWindow(QMainWindow):
 
     @catch_disconnection
     def position_slider_updated(self, pos):
+        if float(self.voltage_readout.text()[:-2]) < 5:
+            QMessageBox.warning(
+                None,
+                "Error",
+                "The voltage going through the servo is too low. Is your battery powered on?",
+            )
+
+            return
         self.active_servo.move(pos)
         self.position_slider_readout.setText(f"{int(pos * 25 / 6) * 6 / 25:0.2f}°")
 
