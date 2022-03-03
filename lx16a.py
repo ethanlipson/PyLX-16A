@@ -92,7 +92,7 @@ class LX16A:
             LX16A._controller.close()
 
         LX16A._controller = serial.Serial(
-            port=port, baudrate=115200, timeout=0.01, write_timeout=0.01
+            port=port, baudrate=115200, timeout=0.02, write_timeout=0.02
         )
 
     @staticmethod
