@@ -1,4 +1,4 @@
-# Version 1.1.1
+# Version 1.1.2
 
 from PyQt6.QtWidgets import (
     QApplication,
@@ -18,6 +18,7 @@ from PyQt6.QtGui import QIntValidator
 import serial.tools.list_ports
 import serial.serialutil
 from pylx16a.lx16a import *
+import platform
 import sys
 
 
@@ -41,7 +42,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setFixedSize(800, 410)
-        self.setWindowTitle("PyLX16A Servo Testing Software")
+        self.setWindowTitle(f"LX-16A Testing Software v1.1.2 ({platform.system()})")
 
         self.port_selection_box = QComboBox(self)
         self.port_selection_box.setFixedSize(200, 27)
