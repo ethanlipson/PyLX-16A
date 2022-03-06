@@ -30,6 +30,11 @@ All servo exceptions have an `id_` member variable containing the errant servo's
 - [`LX16A.initialize`](#lx16ainitialize) - Initialize the class with the bus controller's port
 - [`LX16A.__init__`](#lx16a__init__) - LX16A object constructor
 
+### Miscellaneous
+
+- [`LX16A.set_timeout`](#lx16aset_timeout) - Set the serial port's read and write timeouts
+- [`LX16A.get_timeout`](#lx16aget_timeout) - Get the serial port's read and write timeouts
+
 ### Setter member functions
 
 - [`LX16A.move`](#lx16amove) - Rotate the servo
@@ -74,15 +79,16 @@ All servo exceptions have an `id_` member variable containing the errant servo's
 
 ## LX16A.initialize
 
-`@staticmethod LX16A.initialize(port: str) -> None`
+`@staticmethod LX16A.initialize(port: str, timeout: float = 0.02) -> None`
 
 Initializes the LX16A class with the servo bus controller's port.
 
 #### Parameters
 
-| Parameter | Type | Default Value | Range | Description           |
-| --------- | ---- | ------------- | ----- | --------------------- |
-| port      | str  | Required      | N?A   | Servo controller port |
+| Parameter | Type  | Default Value | Range | Description                        |
+| --------- | ----- | ------------- | ----- | ---------------------------------- |
+| port      | str   | Required      | N/A   | Servo controller port              |
+| timeout   | float | 0.02          | > 0   | Serial port read and write timeout |
 
 #### Return value
 
@@ -113,6 +119,46 @@ None
 
 - `ServoArgumentError`
   - If the servo ID is outside the range 0 - 253
+
+## LX16A.set_timeout
+
+`@staticmethod set_timeout(seconds: float) -> None`
+
+Set the serial port's read and write timeouts.
+
+#### Parameters
+
+| Parameter | Type  | Default Value | Range | Description |
+| --------- | ----- | ------------- | ----- | ----------- |
+| timeout   | float | Required      | > 0   | New timeout |
+
+#### Return value
+
+None
+
+#### Exceptions
+
+None
+
+## LX16A.get_timeout
+
+`@staticmethod get_timeout() -> float`
+
+Get the serial port's read and write timeout.
+
+#### Parameters
+
+None
+
+#### Return value
+
+| Type  | Range | Description     |
+| ----- | ----- | --------------- |
+| float | > 0   | Current timeout |
+
+#### Exceptions
+
+None
 
 ## LX16A.move
 

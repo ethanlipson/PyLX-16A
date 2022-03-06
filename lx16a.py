@@ -85,19 +85,24 @@ class LX16A:
     _controller = None
 
     @staticmethod
-    def initialize(port: str) -> None:
+    def initialize(port: str, timeout: float = 0.02) -> None:
         if LX16A._controller is not None:
             LX16A._controller.reset_input_buffer()
             LX16A._controller.reset_output_buffer()
             LX16A._controller.close()
 
         LX16A._controller = serial.Serial(
-            port=port, baudrate=115200, timeout=0.02, write_timeout=0.02
+            port=port, baudrate=115200, timeout=timeout, write_timeout=timeout
         )
 
     @staticmethod
     def set_timeout(seconds: float) -> None:
         LX16A._controller.timeout = seconds
+        LX16A._controller.write_timeout = seconds
+
+    @staticmethod
+    def get_timeout() -> float:
+        return LX16A._controller.timeout
 
     def __init__(self, id_: int, disable_torque: bool = False) -> None:
         if id_ < 0 or id_ > 253:
