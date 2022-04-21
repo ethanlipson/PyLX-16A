@@ -216,8 +216,8 @@ class LX16A:
         LX16A._check_within_limits(angle, 0, 240, "angle", self._id)
         LX16A._check_within_limits(
             angle,
-            LX16A._to_servo_range(self._angle_limits[0]),
-            LX16A._to_servo_range(self._angle_limits[1]),
+            LX16A._from_servo_range(self._angle_limits[0]),
+            LX16A._from_servo_range(self._angle_limits[1]),
             "angle",
             self._id,
         )
@@ -304,7 +304,7 @@ class LX16A:
         LX16A._check_within_limits(upper_limit, 0, 240, "upper limit", self._id)
         if upper_limit < lower_limit:
             raise ServoArgumentError(
-                f"Servo {self._id}: lower limit (received {lower_limit} must be less than upper limit (received {upper_limit})",
+                f"Servo {self._id}: lower limit (received {lower_limit}) must be less than upper limit (received {upper_limit})",
                 self._id,
             )
 
@@ -326,7 +326,7 @@ class LX16A:
         LX16A._check_within_limits(upper_limit, 4500, 12000, "upper limit", self._id)
         if upper_limit < lower_limit:
             raise ServoArgumentError(
-                f"Servo {self._id}: lower limit (received {lower_limit} must be less than upper limit (received {upper_limit})",
+                f"Servo {self._id}: lower limit (received {lower_limit}) must be less than upper limit (received {upper_limit})",
                 self._id,
             )
 
