@@ -373,12 +373,12 @@ class LX16A:
         self._motor_mode = False
 
     def enable_torque(self) -> None:
-        packet = [self._id, 4, 31, 0]
+        packet = [self._id, 4, 31, 1]
         LX16A._send_packet(packet)
         self._torque_enabled = True
 
     def disable_torque(self) -> None:
-        packet = [self._id, 4, 31, 1]
+        packet = [self._id, 4, 31, 0]
         LX16A._send_packet(packet)
         self._torque_enabled = False
 
