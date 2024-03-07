@@ -347,7 +347,10 @@ class MainWindow(QMainWindow):
     def scan_for_servos(self, port):
         self.setCursor(Qt.CursorShape.WaitCursor)
 
-        LX16A.initialize(port)
+        try:
+            LX16A.initialize(port)
+        except:
+            pass
 
         self.id_selection_box.clear()
 
